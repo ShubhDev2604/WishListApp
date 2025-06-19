@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">DreamDots</string>
+    <string name="wishlist">WishList</string>
+    <string name="add_wish">Add Wish</string>
+    <string name="update_wish">Update Wish</string>
+    <string name="wish_created">Wish has been created.</string>
+    <string name="wish_update">Wish has been updated.</string>
+    <string name="empty_title_message">Title cannot remain empty.</string>
+    <string name="empty_description_message">Description cannot remain empty.</string>
+</resources>
