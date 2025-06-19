@@ -1,5 +1,7 @@
 package com.example.mywishlistapp
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -39,6 +41,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.rememberScaffoldState
+import androidx.compose.ui.platform.LocalContext
 import eu.tutorials.mywishlistapp.AppBarView
 import eu.tutorials.mywishlistapp.R
 import eu.tutorials.mywishlistapp.Screen
@@ -98,6 +101,7 @@ fun HomeView(
                     )
 
                     SwipeToDismiss(
+                        modifier = Modifier.align(Alignment.CenterEnd),
                         state = dismissState,
                         background = {
                             if (dismissState.targetValue != DismissValue.Default || dismissState.progress.fraction > 0f) {
@@ -143,6 +147,7 @@ fun HomeView(
 
 @Composable
 fun WishItem(wish: Wish, onClick: () -> Unit) {
+    val context = LocalContext.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -154,11 +159,15 @@ fun WishItem(wish: Wish, onClick: () -> Unit) {
         backgroundColor = colorResource(id = R.color.background)
     ) {
         Row(
+            modifier = Modifier
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(16.dp)
             ) {
                 Text(
                     modifier = Modifier
@@ -175,7 +184,7 @@ fun WishItem(wish: Wish, onClick: () -> Unit) {
             }
             IconButton(
                 onClick = {
-
+                    shareButtonClicked(wish, context = context)
                 },
             ) {
                 Icon(
@@ -186,4 +195,16 @@ fun WishItem(wish: Wish, onClick: () -> Unit) {
             }
         }
     }
+}
+
+fun shareButtonClicked(wish: Wish, context: Context) {
+    val sendIntent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_SUBJECT, wish.title)
+        putExtra(Intent.EXTRA_TEXT, wish.description)
+        type = "text/plain"
+    }
+
+    val shareIntent = Intent.createChooser(sendIntent, "Share via")
+    context.startActivity(shareIntent)
 }
