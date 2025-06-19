@@ -38,6 +38,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.rememberScaffoldState
@@ -110,22 +111,22 @@ fun HomeView(
                                     targetValue = 0.3f + 0.7f * progress,
                                     label = "iconAlpha"
                                 )
-                                Row(
+                                Box(
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(
-                                            start = 8.dp,
-                                            top = 30.dp,
-                                            end = 8.dp,
-                                            bottom = 8.dp
-                                        ),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.End
+                                        .fillMaxSize(),
+                                    contentAlignment = Alignment.CenterEnd
                                 ) {
                                     Icon(
-                                        Icons.Default.Delete,
+                                        imageVector = Icons.Default.Delete,
                                         contentDescription = "Delete Icon",
-                                        tint = colorResource(id = R.color.primary).copy(alpha = alpha)
+                                        tint = colorResource(id = R.color.primary).copy(alpha = alpha),
+                                        modifier = Modifier
+                                            .padding(end = 24.dp)
+                                            .background(
+                                                color = colorResource(R.color.divider),
+                                                shape = CircleShape
+                                            )
+                                            .padding(12.dp)
                                     )
                                 }
                             }
