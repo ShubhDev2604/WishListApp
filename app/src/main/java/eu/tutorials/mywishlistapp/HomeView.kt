@@ -36,6 +36,8 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material.IconButton
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.rememberScaffoldState
 import eu.tutorials.mywishlistapp.AppBarView
 import eu.tutorials.mywishlistapp.R
@@ -107,7 +109,12 @@ fun HomeView(
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(start = 8.dp, top = 30.dp, end = 8.dp, bottom = 8.dp),
+                                        .padding(
+                                            start = 8.dp,
+                                            top = 30.dp,
+                                            end = 8.dp,
+                                            bottom = 8.dp
+                                        ),
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.End
                                 ) {
@@ -146,21 +153,37 @@ fun WishItem(wish: Wish, onClick: () -> Unit) {
         elevation = 10.dp,
         backgroundColor = colorResource(id = R.color.background)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                modifier = Modifier
-                    .padding(bottom = 4.dp),
-                text = wish.title,
-                style = AppTypography.semiTitle,
-                color = colorResource(id = R.color.on_secondary)
-            )
-            Text(
-                text = wish.description,
-                style = AppTypography.description,
-                color = colorResource(id = R.color.on_background)
-            )
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(
+                    modifier = Modifier
+                        .padding(bottom = 4.dp),
+                    text = wish.title,
+                    style = AppTypography.semiTitle,
+                    color = colorResource(id = R.color.on_secondary)
+                )
+                Text(
+                    text = wish.description,
+                    style = AppTypography.description,
+                    color = colorResource(id = R.color.on_background)
+                )
+            }
+            IconButton(
+                onClick = {
+
+                },
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Share,
+                    contentDescription = "Share Wish",
+                    tint = colorResource(id = R.color.primary)
+                )
+            }
         }
     }
 }
