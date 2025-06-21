@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -20,15 +21,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.ButtonColors
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
-import androidx.compose.material.OutlinedButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.Typography
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -43,25 +40,24 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import eu.tutorials.mywishlistapp.data.Wish
 import eu.tutorials.mywishlistapp.ui.theme.AppTypography
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -82,17 +78,19 @@ fun AddEditDetailView(
         val wish = viewModel.getAWishById(id).collectAsState(initial = Wish(0L, "", ""))
         viewModel.wishTitleState = wish.value.title
         viewModel.wishDescriptionState = wish.value.description
+        viewModel.wishImage = wish.value.imageUri ?: ""
     } else {
         viewModel.wishTitleState = ""
         viewModel.wishDescriptionState = ""
+        viewModel.wishImage = ""
     }
 
     val keyboardController = LocalSoftwareKeyboardController.current
     //since bottomsheet is part of the current scope, you need to create a state variable for it to maintain its visibility, you cant pass on or call a composable func like AddImageBottomSheet inside a clickable
     val (showSheet, setShowSheet) = remember { mutableStateOf(false) }
 
-    var imageURi by rememberSaveable {
-        mutableStateOf<String?>(null)
+    var cameraUri by remember {
+        mutableStateOf<Uri?>(null)
     }
 
     Scaffold(
@@ -195,7 +193,8 @@ fun AddEditDetailView(
                                 Wish(
                                     id = id,
                                     title = viewModel.wishTitleState.trim(),
-                                    description = viewModel.wishDescriptionState.trim()
+                                    description = viewModel.wishDescriptionState.trim(),
+                                    imageUri = viewModel.wishImage
                                 )
                             )
                             navController.navigate(
@@ -209,7 +208,8 @@ fun AddEditDetailView(
                             viewModel.addWish(
                                 Wish(
                                     title = viewModel.wishTitleState.trim(),
-                                    description = viewModel.wishDescriptionState.trim()
+                                    description = viewModel.wishDescriptionState.trim(),
+                                    imageUri = viewModel.wishImage
                                 )
                             )
                             navController.navigate(
@@ -240,11 +240,34 @@ fun AddEditDetailView(
                 )
             }
 
+            if (viewModel.wishImage.isNotEmpty()) {
+                AsyncImage(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            horizontal = 16.dp,
+                            vertical = 8.dp
+                        )
+                        .fillMaxHeight()
+                        .clip(
+                            RoundedCornerShape(12.dp)
+                        )
+                        .border(
+                            1.dp,
+                            Color.Gray,
+                            RoundedCornerShape(12.dp)
+                        ),
+                    contentScale = ContentScale.Crop,
+                    model = viewModel.wishImage,
+                    contentDescription = "Selected Image"
+                )
+            }
+
             val galleryLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.GetContent()
             ) { uri: Uri? ->
                 uri?.let {
-                    imageURi = uri.toString()
+                    viewModel.wishImage = uri.toString()
                 }
             }
 
@@ -252,28 +275,28 @@ fun AddEditDetailView(
                 contract = ActivityResultContracts.TakePicture()
             ) { success ->
                 if (success) {
-                    imageURi?.let {
-                        imageURi = it
+                    val uri = cameraUri
+                    if (uri != null) {
+                        viewModel.wishImage = uri.toString()
                     }
                 }
             }
 
             fun takePhotoWithCamera(context: Context) {
                 val photoFile = createImageFile(context)
-                val photoUri: Uri = FileProvider.getUriForFile(
+                val uri: Uri = FileProvider.getUriForFile(
                     context,
                     "${context.packageName}.provider",
                     photoFile
                 )
-                imageURi = photoUri.toString()
-                cameraLauncher.launch(photoUri)
+                cameraUri = uri
+                cameraLauncher.launch(uri)
             }
 
             fun pickImageFromGallery() {
                 galleryLauncher.launch("image/*")
             }
 
-            // Show the bottom sheet if showSheet is true
             if (showSheet) {
                 AddImageBottomSheet(
                     onPickFromGallery = {

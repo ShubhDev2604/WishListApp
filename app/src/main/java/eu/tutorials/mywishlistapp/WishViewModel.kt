@@ -17,6 +17,7 @@ class WishViewModel(
 
     var wishTitleState by mutableStateOf("")
     var wishDescriptionState by mutableStateOf("")
+    var wishImage by mutableStateOf("")
 
 
     fun onWishTitleChanged(newString:String){
