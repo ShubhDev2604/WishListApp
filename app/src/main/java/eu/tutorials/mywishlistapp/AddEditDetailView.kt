@@ -1,6 +1,7 @@
 package eu.tutorials.mywishlistapp
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Environment
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -239,7 +240,17 @@ fun AddEditDetailView(
             val galleryLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.GetContent()
             ) { uri: Uri? ->
-                uri?.let { image = uri.toString() }
+                uri?.let {
+                    image = uri.toString()
+                    try {
+                        context.contentResolver.takePersistableUriPermission(
+                            it,
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        )
+                    } catch (e: SecurityException) {
+                        // Handle error if needed
+                    }
+                }
             }
             val cameraLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.TakePicture()
