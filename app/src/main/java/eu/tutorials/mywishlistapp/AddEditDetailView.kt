@@ -22,10 +22,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Button
@@ -55,6 +57,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -75,6 +78,7 @@ fun AddEditDetailView(
     val scaffoldState = rememberScaffoldState()
     val keyboardController = LocalSoftwareKeyboardController.current
     val (showSheet, setShowSheet) = remember { mutableStateOf(false) }
+    var showRemoveDialog by remember { mutableStateOf(false) }
     var cameraUri by remember { mutableStateOf<Uri?>(null) }
 
     // Use rememberSaveable for local state
@@ -225,17 +229,40 @@ fun AddEditDetailView(
                 )
             }
             if (image.isNotEmpty()) {
-                AsyncImage(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                         .fillMaxHeight()
                         .clip(RoundedCornerShape(12.dp))
                         .border(1.dp, Color.Gray, RoundedCornerShape(12.dp)),
-                    contentScale = ContentScale.Crop,
-                    model = image,
-                    contentDescription = "Selected Image"
-                )
+                ) {
+                    AsyncImage(
+                        modifier = Modifier
+                            .matchParentSize(),
+                        contentScale = ContentScale.Crop,
+                        model = image,
+                        contentDescription = "Selected Image"
+                    )
+
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.baseline_close_24),
+                        contentDescription = "Remove Image",
+                        tint = colorResource(id = R.color.on_primary),
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp)
+                            .background(
+                                color = colorResource(id = R.color.primary),
+                                shape = RoundedCornerShape(50)
+                            )
+                            .clickable {
+                                showRemoveDialog = true
+                            }
+                            .size(24.dp)
+                    )
+                }
+
             }
             val galleryLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.GetContent()
@@ -262,6 +289,7 @@ fun AddEditDetailView(
                     }
                 }
             }
+
             fun takePhotoWithCamera(context: Context) {
                 val photoFile = createImageFile(context)
                 val uri: Uri = FileProvider.getUriForFile(
@@ -272,6 +300,7 @@ fun AddEditDetailView(
                 cameraUri = uri
                 cameraLauncher.launch(uri)
             }
+
             fun pickImageFromGallery() {
                 galleryLauncher.launch("image/*")
             }
@@ -287,6 +316,54 @@ fun AddEditDetailView(
                     },
                     onDismiss = { setShowSheet(false) },
                     sheetState = rememberModalBottomSheetState()
+                )
+            }
+
+            if (showRemoveDialog) {
+                AlertDialog(
+                    title = {
+                        Text(
+                            text = "Remove Image",
+                            style = AppTypography.semiTitle,
+                            fontSize = 16.sp
+                        )
+                    },
+                    text = {
+                        Text(
+                            text = "Are you sure you want to remove this image?",
+                            style = AppTypography.description,
+                            fontSize = 14.sp
+                        )
+                    },
+                    backgroundColor = colorResource(id = R.color.primary_shade1),
+                    onDismissRequest = {
+                        showRemoveDialog = false
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                image = ""
+                                showRemoveDialog = false
+                            }
+                        ) {
+                            Text(
+                                text = "Yes",
+                                style = AppTypography.button
+                            )
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = {
+                                showRemoveDialog = false
+                            }
+                        ) {
+                            Text(
+                                text = "Cancel",
+                                style = AppTypography.button
+                            )
+                        }
+                    }
                 )
             }
         }
