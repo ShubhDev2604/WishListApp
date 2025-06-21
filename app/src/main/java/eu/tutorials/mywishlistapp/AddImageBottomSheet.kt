@@ -124,12 +124,3 @@ fun AddImageBottomSheet(
         }
     }
 }
-
-@Composable
-fun pickImageFromGallery() {
-    val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) {
-
-    }
-}

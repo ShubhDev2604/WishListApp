@@ -2,6 +2,7 @@ package eu.tutorials.mywishlistapp
 
 import android.content.Context
 import android.net.Uri
+import android.os.Environment
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -56,11 +57,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import eu.tutorials.mywishlistapp.data.Wish
 import eu.tutorials.mywishlistapp.ui.theme.AppTypography
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -245,6 +248,27 @@ fun AddEditDetailView(
                 }
             }
 
+            val cameraLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.TakePicture()
+            ) { success ->
+                if (success) {
+                    imageURi?.let {
+                        imageURi = it
+                    }
+                }
+            }
+
+            fun takePhotoWithCamera(context: Context) {
+                val photoFile = createImageFile(context)
+                val photoUri: Uri = FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.provider",
+                    photoFile
+                )
+                imageURi = photoUri.toString()
+                cameraLauncher.launch(photoUri)
+            }
+
             fun pickImageFromGallery() {
                 galleryLauncher.launch("image/*")
             }
@@ -257,9 +281,9 @@ fun AddEditDetailView(
                         setShowSheet(false)
                     },
                     onTakePhoto = {
-                        
+                        takePhotoWithCamera(context)
                         setShowSheet(false)
-                                  },
+                    },
                     onDismiss = { setShowSheet(false) },
                     sheetState = rememberModalBottomSheetState()
                 )
@@ -297,6 +321,19 @@ fun WishTextField(
         )
     )
 }
+
+fun createImageFile(context: Context): File {
+    val timestamp = System.currentTimeMillis()
+    val storageDir = File(
+        context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+        "MyWishlistApp"
+    )
+    if (!storageDir.exists()) {
+        storageDir.mkdirs()
+    }
+    return File(storageDir, "IMG_${timestamp}.jpg")
+}
+
 
 @Preview
 @Composable
