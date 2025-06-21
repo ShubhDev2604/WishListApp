@@ -24,4 +24,11 @@ object AppTypography {
         fontWeight = FontWeight.Normal,
         fontSize = 12.sp
     )
+
+    val button = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Medium,
+        fontSize = 14.sp,
+        letterSpacing = 1.sp
+    )
 }
