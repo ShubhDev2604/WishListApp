@@ -112,7 +112,9 @@ fun AddEditDetailView(
                     id = R.string.add_wish
                 ),
                 onBackNavClicked = {
-                    navController.navigateUp()
+                    navController.navigate(Screen.HomeScreen.route) {
+                        popUpTo(Screen.HomeScreen.route) { inclusive = true }
+                    }
                 }
             )
         },

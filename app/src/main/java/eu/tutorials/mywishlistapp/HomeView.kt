@@ -42,11 +42,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.IconButton
+import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import eu.tutorials.mywishlistapp.data.Wish
 import eu.tutorials.mywishlistapp.ui.theme.AppTypography
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -58,105 +64,133 @@ fun HomeView(
 ) {
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
+    var showBlocker by remember { mutableStateOf(false) }
 
     LaunchedEffect(snackBarMessage) {
         snackBarMessage?.let { message ->
             if (message.isNotEmpty()) {
-                scaffoldState.snackbarHostState.showSnackbar(message)
+                showBlocker = true
+                val snackBarJob = launch {
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        message,
+                        duration = SnackbarDuration.Indefinite
+                    )
+                }
+                delay(10000)
+                scaffoldState.snackbarHostState.currentSnackbarData?.dismiss()
+                snackBarJob.cancel()
+                navController.navigate(Screen.HomeScreen.route) {
+                    popUpTo(Screen.HomeScreen.route) { inclusive = true }
+                }
+                showBlocker = false
             }
         }
     }
-    
-    Scaffold(
-        scaffoldState = scaffoldState,
-        snackbarHost = { SnackbarHost(scaffoldState.snackbarHostState) },
-        topBar = {
-            AppBarView(title = "WishList")
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    navController.navigate(Screen.AddScreen.route + "/0L")
-                },
-                modifier = Modifier.padding(all = 20.dp),
-                contentColor = colorResource(id = R.color.on_primary),
-                backgroundColor = colorResource(id = R.color.primary)
-            ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = null)
-            }
-        }
-    ) {
-        val wishList = viewModel.getAllWishes.collectAsState(initial = listOf())
-        Box(modifier = Modifier.fillMaxSize()) {
-            if (wishList.value.isEmpty()) {
-                androidx.compose.foundation.Image(
-                    painter = androidx.compose.ui.res.painterResource(id = R.drawable.no_wishes_background),
-                    contentDescription = "No wishes background",
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .fillMaxWidth(0.7f)
-                )
-            }
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(it)
-            ) {
-                items(wishList.value, key = { wish -> wish.id }) { wish ->
-                    val dismissState = rememberDismissState(
-                        confirmStateChange = {
-                            if (it == DismissValue.DismissedToEnd || it == DismissValue.DismissedToStart) {
-                                viewModel.deleteWish(wish)
-                                scope.launch {
-                                    scaffoldState.snackbarHostState.showSnackbar("Wish deleted: ${wish.title}")
-                                }
-                            }
-                            true
-                        }
-                    )
 
-                    SwipeToDismiss(
-                        modifier = Modifier.align(Alignment.CenterEnd),
-                        state = dismissState,
-                        background = {
-                            if (dismissState.targetValue != DismissValue.Default || dismissState.progress.fraction > 0f) {
-                                val progress = dismissState.progress.fraction.coerceIn(0f, 1f)
-                                val alpha by animateFloatAsState(
-                                    targetValue = 0.3f + 0.7f * progress,
-                                    label = "iconAlpha"
-                                )
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize(),
-                                    contentAlignment = Alignment.CenterEnd
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Delete,
-                                        contentDescription = "Delete Icon",
-                                        tint = colorResource(id = R.color.primary).copy(alpha = alpha),
-                                        modifier = Modifier
-                                            .padding(end = 24.dp)
-                                            .background(
-                                                color = colorResource(R.color.divider),
-                                                shape = CircleShape
-                                            )
-                                            .padding(12.dp)
-                                            .size(36.dp * alpha)
-                                    )
-                                }
-                            }
-                        },
-                        directions = setOf(DismissDirection.EndToStart),
-                        dismissThresholds = { FractionalThreshold(0.7f) },
-                        dismissContent = {
-                            WishItem(wish = wish) {
-                                val id = wish.id
-                                navController.navigate(Screen.AddScreen.route + "/$id")
-                            }
-                        }
-                    )
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Scaffold(
+            scaffoldState = scaffoldState,
+            snackbarHost = { SnackbarHost(scaffoldState.snackbarHostState) },
+            topBar = {
+                AppBarView(title = "WishList")
+            },
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = {
+                        navController.navigate(Screen.AddScreen.route + "/0L")
+                    },
+                    modifier = Modifier.padding(all = 20.dp),
+                    contentColor = colorResource(id = R.color.on_primary),
+                    backgroundColor = colorResource(id = R.color.primary)
+                ) {
+                    Icon(imageVector = Icons.Default.Add, contentDescription = null)
                 }
             }
+        ) {
+            val wishList = viewModel.getAllWishes.collectAsState(initial = listOf())
+            Box(modifier = Modifier.fillMaxSize()) {
+                if (wishList.value.isEmpty()) {
+                    androidx.compose.foundation.Image(
+                        painter = androidx.compose.ui.res.painterResource(id = R.drawable.no_wishes_background),
+                        contentDescription = "No wishes background",
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .fillMaxWidth(0.7f)
+                    )
+                }
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(it)
+                ) {
+                    items(wishList.value, key = { wish -> wish.id }) { wish ->
+                        val dismissState = rememberDismissState(
+                            confirmStateChange = {
+                                if (it == DismissValue.DismissedToEnd || it == DismissValue.DismissedToStart) {
+                                    viewModel.deleteWish(wish)
+                                    scope.launch {
+                                        scaffoldState.snackbarHostState.showSnackbar("Wish deleted: ${wish.title}")
+                                    }
+                                }
+                                true
+                            }
+                        )
+
+                        SwipeToDismiss(
+                            modifier = Modifier.align(Alignment.CenterEnd),
+                            state = dismissState,
+                            background = {
+                                if (dismissState.targetValue != DismissValue.Default || dismissState.progress.fraction > 0f) {
+                                    val progress = dismissState.progress.fraction.coerceIn(0f, 1f)
+                                    val alpha by animateFloatAsState(
+                                        targetValue = 0.3f + 0.7f * progress,
+                                        label = "iconAlpha"
+                                    )
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize(),
+                                        contentAlignment = Alignment.CenterEnd
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Delete,
+                                            contentDescription = "Delete Icon",
+                                            tint = colorResource(id = R.color.primary).copy(alpha = alpha),
+                                            modifier = Modifier
+                                                .padding(end = 24.dp)
+                                                .background(
+                                                    color = colorResource(R.color.divider),
+                                                    shape = CircleShape
+                                                )
+                                                .padding(12.dp)
+                                                .size(36.dp * alpha)
+                                        )
+                                    }
+                                }
+                            },
+                            directions = setOf(DismissDirection.EndToStart),
+                            dismissThresholds = { FractionalThreshold(0.7f) },
+                            dismissContent = {
+                                WishItem(wish = wish) {
+                                    val id = wish.id
+                                    navController.navigate(Screen.AddScreen.route + "/$id")
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+        }
+        if (showBlocker) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        color = Color.Transparent
+                    )
+                    .clickable(enabled = false, onClick = {})
+            )
         }
     }
 }
