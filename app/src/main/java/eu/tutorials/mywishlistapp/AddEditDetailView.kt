@@ -1,6 +1,9 @@
 package eu.tutorials.mywishlistapp
 
 import android.content.Context
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -31,9 +34,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -79,7 +85,12 @@ fun AddEditDetailView(
     }
 
     val keyboardController = LocalSoftwareKeyboardController.current
+    //since bottomsheet is part of the current scope, you need to create a state variable for it to maintain its visibility, you cant pass on or call a composable func like AddImageBottomSheet inside a clickable
     val (showSheet, setShowSheet) = remember { mutableStateOf(false) }
+
+    var imageURi by rememberSaveable {
+        mutableStateOf<String?>(null)
+    }
 
     Scaffold(
         topBar = {
@@ -127,7 +138,7 @@ fun AddEditDetailView(
                 modifier = Modifier.height(10.dp)
             )
 
-            Box (
+            Box(
                 modifier = Modifier
                     .border(
                         width = 2.dp,
@@ -147,11 +158,11 @@ fun AddEditDetailView(
                     .clickable {
                         setShowSheet(true)
                     }
-            ){
-                Row (
+            ) {
+                Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-                ){
+                ) {
                     Icon(
                         modifier = Modifier
                             .padding(end = 6.dp)
@@ -184,7 +195,11 @@ fun AddEditDetailView(
                                     description = viewModel.wishDescriptionState.trim()
                                 )
                             )
-                            navController.navigate(Screen.HomeScreen.route + "?snackbarMessage=" + context.getString(R.string.wish_update)) {
+                            navController.navigate(
+                                Screen.HomeScreen.route + "?snackbarMessage=" + context.getString(
+                                    R.string.wish_update
+                                )
+                            ) {
                                 popUpTo(Screen.HomeScreen.route) { inclusive = true }
                             }
                         } else {
@@ -194,7 +209,11 @@ fun AddEditDetailView(
                                     description = viewModel.wishDescriptionState.trim()
                                 )
                             )
-                            navController.navigate(Screen.HomeScreen.route + "?snackbarMessage=" + context.getString(R.string.wish_created)) {
+                            navController.navigate(
+                                Screen.HomeScreen.route + "?snackbarMessage=" + context.getString(
+                                    R.string.wish_created
+                                )
+                            ) {
                                 popUpTo(Screen.HomeScreen.route) { inclusive = true }
                             }
                         }
@@ -218,11 +237,29 @@ fun AddEditDetailView(
                 )
             }
 
+            val galleryLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.GetContent()
+            ) { uri: Uri? ->
+                uri?.let {
+                    imageURi = uri.toString()
+                }
+            }
+
+            fun pickImageFromGallery() {
+                galleryLauncher.launch("image/*")
+            }
+
             // Show the bottom sheet if showSheet is true
             if (showSheet) {
                 AddImageBottomSheet(
-                    onPickFromGallery = { /* handle gallery */ setShowSheet(false) },
-                    onTakePhoto = { /* handle camera */ setShowSheet(false) },
+                    onPickFromGallery = {
+                        pickImageFromGallery()
+                        setShowSheet(false)
+                    },
+                    onTakePhoto = {
+                        
+                        setShowSheet(false)
+                                  },
                     onDismiss = { setShowSheet(false) },
                     sheetState = rememberModalBottomSheetState()
                 )

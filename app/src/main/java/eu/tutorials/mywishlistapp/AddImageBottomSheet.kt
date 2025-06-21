@@ -1,5 +1,7 @@
 package eu.tutorials.mywishlistapp
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -75,7 +77,7 @@ fun AddImageBottomSheet(
                     .padding(2.dp)
                     .fillMaxWidth(),
                 onClick = {
-                    //pickImageFromGallery()
+                    onPickFromGallery()
                 }
             ) {
                 Text(
@@ -108,7 +110,7 @@ fun AddImageBottomSheet(
                     .padding(2.dp)
                     .fillMaxWidth(),
                 onClick = {
-                    //takePhotoWithCamera()
+                    onTakePhoto()
                 }
             ) {
                 Text(
@@ -120,6 +122,14 @@ fun AddImageBottomSheet(
                 Icon(imageVector = ImageVector.vectorResource(id = R.drawable.baseline_camera_alt_24), contentDescription = "Take a Photo")
             }
         }
+    }
+}
+
+@Composable
+fun pickImageFromGallery() {
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) {
 
     }
 }
