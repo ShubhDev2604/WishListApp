@@ -6,8 +6,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.mywishlistapp.AddEditDetailView
-import com.example.mywishlistapp.HomeView
 
 @Composable
 fun Navigation(viewModel: WishViewModel = viewModel(),
@@ -16,8 +14,18 @@ fun Navigation(viewModel: WishViewModel = viewModel(),
         navController= navController,
         startDestination = Screen.HomeScreen.route
     ){
-        composable(Screen.HomeScreen.route){
-            HomeView( viewModel, navController)
+        composable(
+            route = Screen.HomeScreen.route + "?snackbarMessage={snackbarMessage}",
+            arguments = listOf(
+                navArgument("snackbarMessage") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
+        ){
+            val snackbarMessage = it.arguments?.getString("snackbarMessage")
+            HomeView(viewModel, navController, snackbarMessage)
         }
 
         composable(Screen.AddScreen.route + "/{id}",

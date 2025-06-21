@@ -1,4 +1,4 @@
-package com.example.mywishlistapp
+package eu.tutorials.mywishlistapp
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,15 +10,12 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
-import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,9 +29,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import eu.tutorials.mywishlistapp.AppBarView
-import eu.tutorials.mywishlistapp.R
-import eu.tutorials.mywishlistapp.WishViewModel
 import eu.tutorials.mywishlistapp.data.Wish
 import kotlinx.coroutines.launch
 
@@ -45,10 +39,6 @@ fun AddEditDetailView(
     navController: NavController
 ) {
     val context = LocalContext.current
-
-    val snackMessage = remember {
-        mutableStateOf("")
-    }
 
     //To store data in db we need a method or scope that runs asynchronously Ex:- suspend
     val scope = rememberCoroutineScope()
@@ -125,7 +115,9 @@ fun AddEditDetailView(
                                     description = viewModel.wishDescriptionState.trim()
                                 )
                             )
-                            snackMessage.value = context.getString(R.string.wish_update)
+                            navController.navigate(Screen.HomeScreen.route + "?snackbarMessage=" + context.getString(R.string.wish_update)) {
+                                popUpTo(Screen.HomeScreen.route) { inclusive = true }
+                            }
                         } else {
                             viewModel.addWish(
                                 Wish(
@@ -133,24 +125,18 @@ fun AddEditDetailView(
                                     description = viewModel.wishDescriptionState.trim()
                                 )
                             )
-                            snackMessage.value = context.getString(R.string.wish_created)
-                        }
-                        /*
-                    Navigation handled inside coroutine scope and if we want to show anything on the screen we need to use snackBarHostState
-                    which will be running on a scaffold state.
-                     */
-                        scope.launch {
-                            scaffoldState.snackbarHostState.showSnackbar(snackMessage.value)
-                            navController.navigateUp()
+                            navController.navigate(Screen.HomeScreen.route + "?snackbarMessage=" + context.getString(R.string.wish_created)) {
+                                popUpTo(Screen.HomeScreen.route) { inclusive = true }
+                            }
                         }
                     } else {
-                        snackMessage.value = if (viewModel.wishTitleState.isEmpty()) {
+                        val errorMessage = if (viewModel.wishTitleState.isEmpty()) {
                             context.getString(R.string.empty_title_message)
                         } else {
                             context.getString(R.string.empty_description_message)
                         }
                         scope.launch {
-                            scaffoldState.snackbarHostState.showSnackbar(snackMessage.value)
+                            scaffoldState.snackbarHostState.showSnackbar(errorMessage)
                         }
                     }
                 }

@@ -1,8 +1,7 @@
-package com.example.mywishlistapp
+package eu.tutorials.mywishlistapp
 
 import android.content.Context
 import android.content.Intent
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -23,6 +21,7 @@ import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -32,6 +31,8 @@ import androidx.compose.material.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
@@ -43,22 +44,31 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.ui.platform.LocalContext
-import eu.tutorials.mywishlistapp.AppBarView
-import eu.tutorials.mywishlistapp.R
-import eu.tutorials.mywishlistapp.Screen
-import eu.tutorials.mywishlistapp.WishViewModel
 import eu.tutorials.mywishlistapp.data.Wish
 import eu.tutorials.mywishlistapp.ui.theme.AppTypography
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeView(
     viewModel: WishViewModel,
-    navController: NavController
+    navController: NavController,
+    snackBarMessage: String? = null
 ) {
     val scaffoldState = rememberScaffoldState()
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(snackBarMessage) {
+        snackBarMessage?.let { message ->
+            if (message.isNotEmpty()) {
+                scaffoldState.snackbarHostState.showSnackbar(message)
+            }
+        }
+    }
+    
     Scaffold(
         scaffoldState = scaffoldState,
+        snackbarHost = { SnackbarHost(scaffoldState.snackbarHostState) },
         topBar = {
             AppBarView(title = "WishList")
         },
@@ -96,6 +106,9 @@ fun HomeView(
                         confirmStateChange = {
                             if (it == DismissValue.DismissedToEnd || it == DismissValue.DismissedToStart) {
                                 viewModel.deleteWish(wish)
+                                scope.launch {
+                                    scaffoldState.snackbarHostState.showSnackbar("Wish deleted: ${wish.title}")
+                                }
                             }
                             true
                         }
