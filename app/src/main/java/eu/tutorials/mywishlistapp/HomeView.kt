@@ -39,6 +39,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.filled.Share
@@ -140,12 +141,13 @@ fun HomeView(
                                                 shape = CircleShape
                                             )
                                             .padding(12.dp)
+                                            .size(36.dp * alpha)
                                     )
                                 }
                             }
                         },
                         directions = setOf(DismissDirection.EndToStart),
-                        dismissThresholds = { FractionalThreshold(0.1f) },
+                        dismissThresholds = { FractionalThreshold(0.7f) },
                         dismissContent = {
                             WishItem(wish = wish) {
                                 val id = wish.id
