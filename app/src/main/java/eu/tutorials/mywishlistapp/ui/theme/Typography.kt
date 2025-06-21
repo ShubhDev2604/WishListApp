@@ -16,7 +16,7 @@ object AppTypography {
     val semiTitle = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Bold,
-        fontSize = 14.sp
+        fontSize = 16.sp
     )
 
     val description = TextStyle(

@@ -1,5 +1,7 @@
 package com.example.mywishlistapp
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -36,7 +38,11 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.IconButton
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.rememberScaffoldState
+import androidx.compose.ui.platform.LocalContext
 import eu.tutorials.mywishlistapp.AppBarView
 import eu.tutorials.mywishlistapp.R
 import eu.tutorials.mywishlistapp.Screen
@@ -96,6 +102,7 @@ fun HomeView(
                     )
 
                     SwipeToDismiss(
+                        modifier = Modifier.align(Alignment.CenterEnd),
                         state = dismissState,
                         background = {
                             if (dismissState.targetValue != DismissValue.Default || dismissState.progress.fraction > 0f) {
@@ -104,17 +111,22 @@ fun HomeView(
                                     targetValue = 0.3f + 0.7f * progress,
                                     label = "iconAlpha"
                                 )
-                                Row(
+                                Box(
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(start = 8.dp, top = 30.dp, end = 8.dp, bottom = 8.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.End
+                                        .fillMaxSize(),
+                                    contentAlignment = Alignment.CenterEnd
                                 ) {
                                     Icon(
-                                        Icons.Default.Delete,
+                                        imageVector = Icons.Default.Delete,
                                         contentDescription = "Delete Icon",
-                                        tint = colorResource(id = R.color.primary).copy(alpha = alpha)
+                                        tint = colorResource(id = R.color.primary).copy(alpha = alpha),
+                                        modifier = Modifier
+                                            .padding(end = 24.dp)
+                                            .background(
+                                                color = colorResource(R.color.divider),
+                                                shape = CircleShape
+                                            )
+                                            .padding(12.dp)
                                     )
                                 }
                             }
@@ -136,6 +148,7 @@ fun HomeView(
 
 @Composable
 fun WishItem(wish: Wish, onClick: () -> Unit) {
+    val context = LocalContext.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -146,21 +159,53 @@ fun WishItem(wish: Wish, onClick: () -> Unit) {
         elevation = 10.dp,
         backgroundColor = colorResource(id = R.color.background)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
+            Column(
                 modifier = Modifier
-                    .padding(bottom = 4.dp),
-                text = wish.title,
-                style = AppTypography.semiTitle,
-                color = colorResource(id = R.color.on_secondary)
-            )
-            Text(
-                text = wish.description,
-                style = AppTypography.description,
-                color = colorResource(id = R.color.on_background)
-            )
+                    .weight(1f)
+                    .padding(16.dp)
+            ) {
+                Text(
+                    modifier = Modifier
+                        .padding(bottom = 4.dp),
+                    text = wish.title,
+                    style = AppTypography.semiTitle,
+                    color = colorResource(id = R.color.on_secondary)
+                )
+                Text(
+                    text = wish.description,
+                    style = AppTypography.description,
+                    color = colorResource(id = R.color.on_background)
+                )
+            }
+            IconButton(
+                onClick = {
+                    shareButtonClicked(wish, context = context)
+                },
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Share,
+                    contentDescription = "Share Wish",
+                    tint = colorResource(id = R.color.primary)
+                )
+            }
         }
     }
+}
+
+fun shareButtonClicked(wish: Wish, context: Context) {
+    val sendIntent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_SUBJECT, wish.title)
+        putExtra(Intent.EXTRA_TEXT, wish.description)
+        type = "text/plain"
+    }
+
+    val shareIntent = Intent.createChooser(sendIntent, "Share via")
+    context.startActivity(shareIntent)
 }
