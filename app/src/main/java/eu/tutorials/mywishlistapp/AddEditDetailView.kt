@@ -1,5 +1,6 @@
 package eu.tutorials.mywishlistapp
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -26,8 +27,12 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.Typography
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,8 +53,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import eu.tutorials.mywishlistapp.data.Wish
 import eu.tutorials.mywishlistapp.ui.theme.AppTypography
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditDetailView(
     id: Long,
@@ -72,6 +79,7 @@ fun AddEditDetailView(
     }
 
     val keyboardController = LocalSoftwareKeyboardController.current
+    val (showSheet, setShowSheet) = remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -137,7 +145,7 @@ fun AddEditDetailView(
                     )
                     .padding(2.dp)
                     .clickable {
-
+                        setShowSheet(true)
                     }
             ){
                 Row (
@@ -207,6 +215,16 @@ fun AddEditDetailView(
                         id = R.string.add_wish
                     ),
                     style = AppTypography.button
+                )
+            }
+
+            // Show the bottom sheet if showSheet is true
+            if (showSheet) {
+                AddImageBottomSheet(
+                    onPickFromGallery = { /* handle gallery */ setShowSheet(false) },
+                    onTakePhoto = { /* handle camera */ setShowSheet(false) },
+                    onDismiss = { setShowSheet(false) },
+                    sheetState = rememberModalBottomSheetState()
                 )
             }
         }
