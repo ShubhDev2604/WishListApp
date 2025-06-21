@@ -31,6 +31,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -69,28 +70,34 @@ fun AddEditDetailView(
     navController: NavController
 ) {
     val context = LocalContext.current
-
-    //To store data in db we need a method or scope that runs asynchronously Ex:- suspend
     val scope = rememberCoroutineScope()
-
     val scaffoldState = rememberScaffoldState()
-    if (id != 0L) {
-        val wish = viewModel.getAWishById(id).collectAsState(initial = Wish(0L, "", ""))
-        viewModel.wishTitleState = wish.value.title
-        viewModel.wishDescriptionState = wish.value.description
-        viewModel.wishImage = wish.value.imageUri ?: ""
-    } else {
-        viewModel.wishTitleState = ""
-        viewModel.wishDescriptionState = ""
-        viewModel.wishImage = ""
-    }
-
     val keyboardController = LocalSoftwareKeyboardController.current
-    //since bottomsheet is part of the current scope, you need to create a state variable for it to maintain its visibility, you cant pass on or call a composable func like AddImageBottomSheet inside a clickable
     val (showSheet, setShowSheet) = remember { mutableStateOf(false) }
+    var cameraUri by remember { mutableStateOf<Uri?>(null) }
 
-    var cameraUri by remember {
-        mutableStateOf<Uri?>(null)
+    // Use rememberSaveable for local state
+    var title by rememberSaveable { mutableStateOf("") }
+    var description by rememberSaveable { mutableStateOf("") }
+    var image by rememberSaveable { mutableStateOf("") }
+
+    // Only set initial state when id changes, and only if user hasn't started editing
+    LaunchedEffect(key1 = id) {
+        if (id != 0L) {
+            viewModel.getAWishById(id).collect { wish ->
+                if (title.isEmpty() && description.isEmpty()) {
+                    title = wish.title
+                    description = wish.description
+                    image = wish.imageUri ?: ""
+                }
+            }
+        } else {
+            if (title.isEmpty() && description.isEmpty()) {
+                title = ""
+                description = ""
+                image = ""
+            }
+        }
     }
 
     Scaffold(
@@ -113,32 +120,19 @@ fun AddEditDetailView(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Spacer(
-                modifier = Modifier.height(10.dp)
-            )
+            Spacer(modifier = Modifier.height(10.dp))
             WishTextField(
                 label = "Title",
-                value = viewModel.wishTitleState,
-                onValueChanged = {
-                    viewModel.onWishTitleChanged(it)
-                }
+                value = title,
+                onValueChanged = { title = it }
             )
-
-            Spacer(
-                modifier = Modifier.height(10.dp)
-            )
+            Spacer(modifier = Modifier.height(10.dp))
             WishTextField(
                 label = "Description",
-                value = viewModel.wishDescriptionState,
-                onValueChanged = {
-                    viewModel.onWishDescriptionChanged(it)
-                }
+                value = description,
+                onValueChanged = { description = it }
             )
-
-            Spacer(
-                modifier = Modifier.height(10.dp)
-            )
-
+            Spacer(modifier = Modifier.height(10.dp))
             Box(
                 modifier = Modifier
                     .border(
@@ -151,14 +145,10 @@ fun AddEditDetailView(
                                 colorResource(id = R.color.primary_shade5)
                             )
                         ),
-                        shape = RoundedCornerShape(
-                            12.dp
-                        )
+                        shape = RoundedCornerShape(12.dp)
                     )
                     .padding(2.dp)
-                    .clickable {
-                        setShowSheet(true)
-                    }
+                    .clickable { setShowSheet(true) }
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -177,24 +167,18 @@ fun AddEditDetailView(
                     )
                 }
             }
-
-            Spacer(
-                modifier = Modifier.height(10.dp)
-            )
+            Spacer(modifier = Modifier.height(10.dp))
             Button(
                 onClick = {
                     keyboardController?.hide()
-                    if (
-                        viewModel.wishTitleState.isNotEmpty() &&
-                        viewModel.wishDescriptionState.isNotEmpty()
-                    ) {
+                    if (title.isNotEmpty() && description.isNotEmpty()) {
                         if (id != 0L) {
                             viewModel.updateWish(
                                 Wish(
                                     id = id,
-                                    title = viewModel.wishTitleState.trim(),
-                                    description = viewModel.wishDescriptionState.trim(),
-                                    imageUri = viewModel.wishImage
+                                    title = title.trim(),
+                                    description = description.trim(),
+                                    imageUri = image
                                 )
                             )
                             navController.navigate(
@@ -207,9 +191,9 @@ fun AddEditDetailView(
                         } else {
                             viewModel.addWish(
                                 Wish(
-                                    title = viewModel.wishTitleState.trim(),
-                                    description = viewModel.wishDescriptionState.trim(),
-                                    imageUri = viewModel.wishImage
+                                    title = title.trim(),
+                                    description = description.trim(),
+                                    imageUri = image
                                 )
                             )
                             navController.navigate(
@@ -221,7 +205,7 @@ fun AddEditDetailView(
                             }
                         }
                     } else {
-                        val errorMessage = if (viewModel.wishTitleState.isEmpty()) {
+                        val errorMessage = if (title.isEmpty()) {
                             context.getString(R.string.empty_title_message)
                         } else {
                             context.getString(R.string.empty_description_message)
@@ -239,49 +223,34 @@ fun AddEditDetailView(
                     style = AppTypography.button
                 )
             }
-
-            if (viewModel.wishImage.isNotEmpty()) {
+            if (image.isNotEmpty()) {
                 AsyncImage(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(
-                            horizontal = 16.dp,
-                            vertical = 8.dp
-                        )
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
                         .fillMaxHeight()
-                        .clip(
-                            RoundedCornerShape(12.dp)
-                        )
-                        .border(
-                            1.dp,
-                            Color.Gray,
-                            RoundedCornerShape(12.dp)
-                        ),
+                        .clip(RoundedCornerShape(12.dp))
+                        .border(1.dp, Color.Gray, RoundedCornerShape(12.dp)),
                     contentScale = ContentScale.Crop,
-                    model = viewModel.wishImage,
+                    model = image,
                     contentDescription = "Selected Image"
                 )
             }
-
             val galleryLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.GetContent()
             ) { uri: Uri? ->
-                uri?.let {
-                    viewModel.wishImage = uri.toString()
-                }
+                uri?.let { image = uri.toString() }
             }
-
             val cameraLauncher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.TakePicture()
             ) { success ->
                 if (success) {
                     val uri = cameraUri
                     if (uri != null) {
-                        viewModel.wishImage = uri.toString()
+                        image = uri.toString()
                     }
                 }
             }
-
             fun takePhotoWithCamera(context: Context) {
                 val photoFile = createImageFile(context)
                 val uri: Uri = FileProvider.getUriForFile(
@@ -292,11 +261,9 @@ fun AddEditDetailView(
                 cameraUri = uri
                 cameraLauncher.launch(uri)
             }
-
             fun pickImageFromGallery() {
                 galleryLauncher.launch("image/*")
             }
-
             if (showSheet) {
                 AddImageBottomSheet(
                     onPickFromGallery = {
