@@ -2,9 +2,13 @@ package eu.tutorials.mywishlistapp
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,8 +43,14 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.requiredWidthIn
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.IconButton
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.icons.filled.Share
@@ -48,8 +58,11 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import coil.compose.AsyncImage
 import eu.tutorials.mywishlistapp.data.Wish
 import eu.tutorials.mywishlistapp.ui.theme.AppTypography
 import kotlinx.coroutines.delay
@@ -76,7 +89,7 @@ fun HomeView(
                         duration = SnackbarDuration.Indefinite
                     )
                 }
-                delay(10000)
+                delay(1000)
                 scaffoldState.snackbarHostState.currentSnackbarData?.dismiss()
                 snackBarJob.cancel()
                 navController.navigate(Screen.HomeScreen.route) {
@@ -170,7 +183,7 @@ fun HomeView(
                                 }
                             },
                             directions = setOf(DismissDirection.EndToStart),
-                            dismissThresholds = { FractionalThreshold(0.7f) },
+                            dismissThresholds = { FractionalThreshold(0.8f) },
                             dismissContent = {
                                 WishItem(wish = wish) {
                                     val id = wish.id
@@ -195,6 +208,7 @@ fun HomeView(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WishItem(wish: Wish, onClick: () -> Unit) {
     val context = LocalContext.current
@@ -232,16 +246,51 @@ fun WishItem(wish: Wish, onClick: () -> Unit) {
                     color = colorResource(id = R.color.on_background)
                 )
             }
-            IconButton(
-                onClick = {
-                    shareButtonClicked(wish, context = context)
-                },
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Default.Share,
-                    contentDescription = "Share Wish",
-                    tint = colorResource(id = R.color.primary)
-                )
+                if (!wish.imageUri.isNullOrEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .height(150.dp)
+                            .padding(vertical = 6.dp)
+                            .requiredWidthIn(150.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .border(1.dp, Color.Gray, RoundedCornerShape(12.dp))
+                            .combinedClickable(
+                                onClick = {},
+                                onLongClick = {
+                                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                                        setDataAndType(
+                                            Uri.parse(wish.imageUri), "image/*"
+                                        )
+                                        flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                    }
+                                    context.startActivity(intent)
+                                }
+                            ),
+                    ) {
+                        AsyncImage(
+                            modifier = Modifier
+                                .matchParentSize(),
+                            contentScale = ContentScale.Fit,
+                            model = wish.imageUri,
+                            contentDescription = "Selected Image"
+                        )
+                    }
+                }
+                IconButton(
+                    onClick = {
+                        shareButtonClicked(wish, context = context)
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Share,
+                        contentDescription = "Share Wish",
+                        tint = colorResource(id = R.color.primary)
+                    )
+                }
             }
         }
     }
@@ -250,11 +299,12 @@ fun WishItem(wish: Wish, onClick: () -> Unit) {
 fun shareButtonClicked(wish: Wish, context: Context) {
     val sendIntent = Intent().apply {
         action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_SUBJECT, wish.title)
-        putExtra(Intent.EXTRA_TEXT, wish.description)
-        type = "text/plain"
+        putExtra(Intent.EXTRA_TEXT, "*${wish.title}*\n\n${wish.description}")
+        putExtra(Intent.EXTRA_STREAM, Uri.parse(wish.imageUri))
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        type = "image/*"
     }
 
-    val shareIntent = Intent.createChooser(sendIntent, "Share via")
+    val shareIntent = Intent.createChooser(sendIntent, "Share Wish")
     context.startActivity(shareIntent)
 }
