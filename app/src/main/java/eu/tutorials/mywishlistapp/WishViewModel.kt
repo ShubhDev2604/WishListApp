@@ -13,17 +13,17 @@ import kotlinx.coroutines.launch
 
 class WishViewModel(
     private val wishRepository: WishRepository = Graph.wishRepository
-):ViewModel() {
+): ViewModel() {
 
     var wishTitleState by mutableStateOf("")
     var wishDescriptionState by mutableStateOf("")
+    var wishImage by mutableStateOf("")
 
-
-    fun onWishTitleChanged(newString:String){
+    fun onWishTitleChanged(newString: String) {
         wishTitleState = newString
     }
 
-    fun onWishDescriptionChanged(newString: String){
+    fun onWishDescriptionChanged(newString: String) {
         wishDescriptionState = newString
     }
 
@@ -35,25 +35,25 @@ class WishViewModel(
         }
     }
 
-    fun addWish(wish: Wish){
+    fun addWish(wish: Wish) {
         viewModelScope.launch(Dispatchers.IO) {
-            wishRepository.addAWish(wish= wish)
+            wishRepository.addAWish(wish = wish)
         }
     }
 
-    fun getAWishById(id:Long):Flow<Wish> {
+    fun getAWishById(id: Long): Flow<Wish> {
         return wishRepository.getAWishById(id)
     }
 
-    fun updateWish(wish: Wish){
+    fun updateWish(wish: Wish) {
         viewModelScope.launch(Dispatchers.IO) {
-            wishRepository.updateAWish(wish= wish)
+            wishRepository.updateAWish(wish = wish)
         }
     }
 
-    fun deleteWish(wish: Wish){
+    fun deleteWish(wish: Wish) {
         viewModelScope.launch(Dispatchers.IO) {
-            wishRepository.deleteAWish(wish= wish)
+            wishRepository.deleteAWish(wish = wish)
             getAllWishes = wishRepository.getWishes()
         }
     }

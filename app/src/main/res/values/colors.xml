@@ -8,8 +8,11 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="app_bar_color">#DD1523</color>
+    <color name="primary_shade1">#E1E4FB</color>
+    <color name="primary_shade2">#AEB6F2</color>
     <color name="primary">#4C5FD5</color>
     <color name="primary_variant">#3B4DB3</color>
+    <color name="primary_shade5">#2B3A8C</color>
     <color name="secondary">#FEC260</color>
     <color name="background">#F9F9FB</color>
     <color name="surface">#FFFFFF</color>
