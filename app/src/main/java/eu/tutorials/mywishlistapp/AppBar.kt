@@ -1,5 +1,6 @@
 package eu.tutorials.mywishlistapp
 
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
@@ -19,7 +20,8 @@ import eu.tutorials.mywishlistapp.ui.theme.AppTypography
 @Composable
 fun AppBarView(
     title: String,
-    onBackNavClicked: () -> Unit= {}
+    onBackNavClicked: () -> Unit= {},
+    actions: @Composable (RowScope.() -> Unit) = {},
 ){
     val context = LocalContext.current
     val navigationIcon : (@Composable () -> Unit)? =
@@ -55,6 +57,7 @@ fun AppBarView(
     },
         elevation = 3.dp,
         backgroundColor = colorResource(id = R.color.primary_variant),
-        navigationIcon = navigationIcon
+        navigationIcon = navigationIcon,
+        actions = actions
     )
 }

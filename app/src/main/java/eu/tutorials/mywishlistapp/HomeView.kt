@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -43,12 +44,9 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.requiredWidthIn
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.IconButton
@@ -62,6 +60,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImage
 import eu.tutorials.mywishlistapp.data.Wish
 import eu.tutorials.mywishlistapp.ui.theme.AppTypography
@@ -78,6 +77,7 @@ fun HomeView(
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
     var showBlocker by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     LaunchedEffect(snackBarMessage) {
         snackBarMessage?.let { message ->
@@ -107,7 +107,29 @@ fun HomeView(
             scaffoldState = scaffoldState,
             snackbarHost = { SnackbarHost(scaffoldState.snackbarHostState) },
             topBar = {
-                AppBarView(title = "WishList")
+                AppBarView(
+                    title = "WishList",
+                    actions = {
+                        IconButton(onClick = {
+                            shareButtonClicked("https://www.linkedin.com/in/shubh-tandon-8133b8201/", context)
+                        }) {
+                            Image(
+                                painter = painterResource(id = R.drawable.linkedin),
+                                contentDescription = "Linked-In page",
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                        IconButton(onClick = {
+                            shareButtonClicked("https://github.com/ShubhDev2604/WishListApp", context)
+                        }) {
+                            Image(
+                                painter = painterResource(id = R.drawable.github_mark_white),
+                                contentDescription = "Github Repo Link",
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    }
+                )
             },
             floatingActionButton = {
                 FloatingActionButton(
@@ -125,8 +147,8 @@ fun HomeView(
             val wishList = viewModel.getAllWishes.collectAsState(initial = listOf())
             Box(modifier = Modifier.fillMaxSize()) {
                 if (wishList.value.isEmpty()) {
-                    androidx.compose.foundation.Image(
-                        painter = androidx.compose.ui.res.painterResource(id = R.drawable.no_wishes_background),
+                    Image(
+                        painter = painterResource(id = R.drawable.no_wishes_background),
                         contentDescription = "No wishes background",
                         modifier = Modifier
                             .align(Alignment.Center)
@@ -307,4 +329,10 @@ fun shareButtonClicked(wish: Wish, context: Context) {
 
     val shareIntent = Intent.createChooser(sendIntent, "Share Wish")
     context.startActivity(shareIntent)
+}
+
+fun shareButtonClicked(link: String, context: Context) {
+    val uri = Uri.parse(link)
+    val browserIntent = Intent(Intent.ACTION_VIEW, uri)
+    context.startActivity(browserIntent)
 }
