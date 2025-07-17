@@ -75,7 +75,9 @@ import kotlinx.coroutines.launch
 fun HomeView(
     viewModel: WishViewModel,
     navController: NavController,
-    snackBarMessage: String? = null
+    snackBarMessage: String? = null,
+    isDarkTheme: Boolean,
+    onToggleTheme: () -> Unit
 ) {
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
@@ -133,6 +135,15 @@ fun HomeView(
                                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer)
                             )
                         }
+                        IconButton(onClick = {
+                            onToggleTheme()
+                        }) {
+                            Image(
+                                painter = painterResource(id = if(isDarkTheme) R.drawable.moon else R.drawable.sunscreen),
+                                contentDescription = "Toggle Theme",
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
                     }
                 )
             },
@@ -154,7 +165,7 @@ fun HomeView(
             Box(modifier = Modifier.fillMaxSize()) {
                 if (wishList.value.isEmpty()) {
                     Image(
-                        painter = painterResource(id = if(isSystemInDarkTheme()) R.drawable.no_wishes_background_dark_theme else R.drawable.no_wishes_background),
+                        painter = painterResource(id = if(isDarkTheme) R.drawable.no_wishes_background_dark_theme else R.drawable.no_wishes_background),
                         contentDescription = "No wishes background",
                         modifier = Modifier
                             .align(Alignment.Center)
@@ -202,7 +213,9 @@ fun HomeView(
                                             modifier = Modifier
                                                 .padding(end = 24.dp)
                                                 .background(
-                                                    color = MaterialTheme.colorScheme.inverseSurface.copy(alpha = alpha),
+                                                    color = MaterialTheme.colorScheme.inverseSurface.copy(
+                                                        alpha = alpha
+                                                    ),
                                                     shape = CircleShape
                                                 )
                                                 .padding(12.dp)
@@ -286,7 +299,11 @@ fun WishItem(wish: Wish, onClick: () -> Unit) {
                             .padding(vertical = 6.dp)
                             .requiredWidthIn(150.dp)
                             .clip(RoundedCornerShape(12.dp))
-                            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(12.dp))
+                            .border(
+                                1.dp,
+                                MaterialTheme.colorScheme.outlineVariant,
+                                RoundedCornerShape(12.dp)
+                            )
                             .combinedClickable(
                                 onClick = {},
                                 onLongClick = {
