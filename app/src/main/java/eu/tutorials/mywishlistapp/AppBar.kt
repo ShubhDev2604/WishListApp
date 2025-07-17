@@ -8,6 +8,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -35,7 +36,7 @@ fun AppBarView(
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        tint = Color.White,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         contentDescription = null
                     )
                 }
@@ -48,7 +49,7 @@ fun AppBarView(
     TopAppBar(
         title = {
         Text(text = title,
-            color = colorResource(id = R.color.on_primary),
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
             modifier = Modifier
                 .padding(start = 4.dp)
                 .heightIn(max = 24.dp),
@@ -56,7 +57,7 @@ fun AppBarView(
         )
     },
         elevation = 3.dp,
-        backgroundColor = colorResource(id = R.color.primary_variant),
+        backgroundColor = MaterialTheme.colorScheme.primaryContainer,
         navigationIcon = navigationIcon,
         actions = actions
     )

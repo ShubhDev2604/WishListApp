@@ -10,6 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -53,11 +54,13 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -116,7 +119,8 @@ fun HomeView(
                             Image(
                                 painter = painterResource(id = R.drawable.linkedin),
                                 contentDescription = "Linked-In page",
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(24.dp),
+                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer)
                             )
                         }
                         IconButton(onClick = {
@@ -125,7 +129,8 @@ fun HomeView(
                             Image(
                                 painter = painterResource(id = R.drawable.github_mark_white),
                                 contentDescription = "Github Repo Link",
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(24.dp),
+                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer)
                             )
                         }
                     }
@@ -137,22 +142,24 @@ fun HomeView(
                         navController.navigate(Screen.AddScreen.route + "/0L")
                     },
                     modifier = Modifier.padding(all = 20.dp),
-                    contentColor = colorResource(id = R.color.on_primary),
-                    backgroundColor = colorResource(id = R.color.primary)
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    backgroundColor = MaterialTheme.colorScheme.primaryContainer
                 ) {
                     Icon(imageVector = Icons.Default.Add, contentDescription = null)
                 }
-            }
+            },
+            backgroundColor = MaterialTheme.colorScheme.background
         ) {
             val wishList = viewModel.getAllWishes.collectAsState(initial = listOf())
             Box(modifier = Modifier.fillMaxSize()) {
                 if (wishList.value.isEmpty()) {
                     Image(
-                        painter = painterResource(id = R.drawable.no_wishes_background),
+                        painter = painterResource(id = if(isSystemInDarkTheme()) R.drawable.no_wishes_background_dark_theme else R.drawable.no_wishes_background),
                         contentDescription = "No wishes background",
                         modifier = Modifier
                             .align(Alignment.Center)
                             .fillMaxWidth(0.7f)
+                            .background(Color.Transparent)
                     )
                 }
                 LazyColumn(
@@ -191,11 +198,11 @@ fun HomeView(
                                         Icon(
                                             imageVector = Icons.Default.Delete,
                                             contentDescription = "Delete Icon",
-                                            tint = colorResource(id = R.color.primary).copy(alpha = alpha),
+                                            tint = MaterialTheme.colorScheme.inverseOnSurface,
                                             modifier = Modifier
                                                 .padding(end = 24.dp)
                                                 .background(
-                                                    color = colorResource(R.color.divider),
+                                                    color = MaterialTheme.colorScheme.inverseSurface.copy(alpha = alpha),
                                                     shape = CircleShape
                                                 )
                                                 .padding(12.dp)
@@ -242,7 +249,7 @@ fun WishItem(wish: Wish, onClick: () -> Unit) {
                 onClick()
             },
         elevation = 10.dp,
-        backgroundColor = colorResource(id = R.color.background)
+        backgroundColor = MaterialTheme.colorScheme.surface
     ) {
         Row(
             modifier = Modifier
@@ -260,12 +267,12 @@ fun WishItem(wish: Wish, onClick: () -> Unit) {
                         .padding(bottom = 4.dp),
                     text = wish.title,
                     style = AppTypography.semiTitle,
-                    color = colorResource(id = R.color.on_secondary)
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = wish.description,
                     style = AppTypography.description,
-                    color = colorResource(id = R.color.on_background)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -279,7 +286,7 @@ fun WishItem(wish: Wish, onClick: () -> Unit) {
                             .padding(vertical = 6.dp)
                             .requiredWidthIn(150.dp)
                             .clip(RoundedCornerShape(12.dp))
-                            .border(1.dp, Color.Gray, RoundedCornerShape(12.dp))
+                            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(12.dp))
                             .combinedClickable(
                                 onClick = {},
                                 onLongClick = {
@@ -310,7 +317,7 @@ fun WishItem(wish: Wish, onClick: () -> Unit) {
                     Icon(
                         imageVector = Icons.Default.Share,
                         contentDescription = "Share Wish",
-                        tint = colorResource(id = R.color.primary)
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             }

@@ -31,11 +31,12 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,7 +52,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -118,7 +118,8 @@ fun AddEditDetailView(
                 }
             )
         },
-        scaffoldState = scaffoldState
+        scaffoldState = scaffoldState,
+        backgroundColor = MaterialTheme.colorScheme.background
     ) {
         Column(
             modifier = Modifier
@@ -146,12 +147,16 @@ fun AddEditDetailView(
                         width = 2.dp,
                         brush = Brush.linearGradient(
                             listOf(
-                                colorResource(id = R.color.primary_shade2),
-                                colorResource(id = R.color.primary),
-                                colorResource(id = R.color.primary_variant),
-                                colorResource(id = R.color.primary_shade5)
+                                MaterialTheme.colorScheme.primaryContainer,
+                                MaterialTheme.colorScheme.primary,
+                                MaterialTheme.colorScheme.inversePrimary,
+                                MaterialTheme.colorScheme.onPrimaryContainer
                             )
                         ),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceVariant,
                         shape = RoundedCornerShape(12.dp)
                     )
                     .padding(2.dp)
@@ -166,16 +171,22 @@ fun AddEditDetailView(
                             .padding(end = 6.dp)
                             .size(36.dp),
                         imageVector = ImageVector.vectorResource(id = R.drawable.baseline_camera_24),
-                        contentDescription = "Take Photo"
+                        contentDescription = "Take Photo",
+                        tint = MaterialTheme.colorScheme.primary
                     )
                     Text(
                         style = AppTypography.button,
-                        text = "Upload Image"
+                        text = "Upload Image",
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
             Spacer(modifier = Modifier.height(10.dp))
             Button(
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
                 onClick = {
                     keyboardController?.hide()
                     if (title.isNotEmpty() && description.isNotEmpty()) {
@@ -237,7 +248,7 @@ fun AddEditDetailView(
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                         .fillMaxHeight()
                         .clip(RoundedCornerShape(12.dp))
-                        .border(1.dp, Color.Gray, RoundedCornerShape(12.dp)),
+                        .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp)),
                 ) {
                     AsyncImage(
                         modifier = Modifier
@@ -250,12 +261,12 @@ fun AddEditDetailView(
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.baseline_close_24),
                         contentDescription = "Remove Image",
-                        tint = colorResource(id = R.color.on_primary),
+                        tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier
                             .align(Alignment.TopEnd)
                             .padding(8.dp)
                             .background(
-                                color = colorResource(id = R.color.primary),
+                                color = MaterialTheme.colorScheme.primary,
                                 shape = RoundedCornerShape(50)
                             )
                             .clickable {
@@ -337,7 +348,7 @@ fun AddEditDetailView(
                             fontSize = 14.sp
                         )
                     },
-                    backgroundColor = colorResource(id = R.color.primary_shade1),
+                    backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
                     onDismissRequest = {
                         showRemoveDialog = false
                     },
@@ -384,7 +395,7 @@ fun WishTextField(
         label = {
             Text(
                 text = label,
-                color = colorResource(id = R.color.primary)
+                color = MaterialTheme.colorScheme.primary
             )
         },
         modifier = Modifier
@@ -392,12 +403,12 @@ fun WishTextField(
             .padding(horizontal = 8.dp),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            textColor = colorResource(id = R.color.primary),
-            focusedLabelColor = colorResource(id = R.color.primary_variant),
-            focusedBorderColor = colorResource(id = R.color.primary_variant),
-            unfocusedLabelColor = colorResource(id = R.color.primary),
-            unfocusedBorderColor = colorResource(id = R.color.primary),
-            cursorColor = colorResource(id = R.color.primary)
+            textColor = MaterialTheme.colorScheme.onSurface,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+            cursorColor = MaterialTheme.colorScheme.primary
         )
     )
 }
