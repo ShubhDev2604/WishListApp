@@ -3,6 +3,6 @@
 
     <style name="Theme.MyWishListApp" parent="android:Theme.Material.Light.NoActionBar" >
         <item name="android:windowSplashScreenBackground">@color/splash_background</item>
-        <item name="android:windowSplashScreenIconBackgroundColor">@color/white</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@color/primary_shade1</item>
     </style>
 </resources>
