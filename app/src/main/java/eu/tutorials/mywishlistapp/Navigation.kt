@@ -9,7 +9,9 @@ import androidx.navigation.compose.composable
 
 @Composable
 fun Navigation(viewModel: WishViewModel = viewModel(),
-               navController: NavHostController = rememberNavController()){
+               navController: NavHostController = rememberNavController(),
+               isDarkTheme: Boolean,
+               onToggleTheme: () -> Unit){
     NavHost(
         navController= navController,
         startDestination = Screen.HomeScreen.route
@@ -25,7 +27,7 @@ fun Navigation(viewModel: WishViewModel = viewModel(),
             )
         ){
             val snackbarMessage = it.arguments?.getString("snackbarMessage")
-            HomeView(viewModel, navController, snackbarMessage)
+            HomeView(viewModel, navController, snackbarMessage, isDarkTheme, onToggleTheme)
         }
 
         composable(Screen.AddScreen.route + "/{id}",
