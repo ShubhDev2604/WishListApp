@@ -1,7 +1,5 @@
 package eu.tutorials.mywishlistapp
 
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,16 +14,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import eu.tutorials.mywishlistapp.ui.theme.AppTypography
@@ -44,8 +40,8 @@ fun AddImageBottomSheet(
         shape = RoundedCornerShape(
             12.dp
         ),
-        containerColor = colorResource(id = R.color.primary_shade1),
-        contentColor = colorResource(id = R.color.primary_shade5),
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
         windowInsets = WindowInsets.navigationBars,
         onDismissRequest = onDismiss
     ) {
@@ -64,10 +60,10 @@ fun AddImageBottomSheet(
                         width = 2.dp,
                         brush = Brush.linearGradient(
                             listOf(
-                                colorResource(id = R.color.primary_shade2),
-                                colorResource(id = R.color.primary),
-                                colorResource(id = R.color.primary_variant),
-                                colorResource(id = R.color.primary_shade5)
+                                MaterialTheme.colorScheme.primaryContainer,
+                                MaterialTheme.colorScheme.primary,
+                                MaterialTheme.colorScheme.inversePrimary,
+                                MaterialTheme.colorScheme.onPrimaryContainer
                             )
                         ),
                         shape = RoundedCornerShape(
@@ -84,9 +80,14 @@ fun AddImageBottomSheet(
                     text = "Pick from Gallery",
                     style = AppTypography.button,
                     modifier = Modifier
-                        .padding(end = 4.dp)
+                        .padding(end = 4.dp),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-                Icon(imageVector = ImageVector.vectorResource(id = R.drawable.baseline_image_24), contentDescription = "Pick from Gallery")
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.baseline_image_24),
+                    contentDescription = "Pick from Gallery",
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
             }
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -97,10 +98,10 @@ fun AddImageBottomSheet(
                         width = 2.dp,
                         brush = Brush.linearGradient(
                             listOf(
-                                colorResource(id = R.color.primary_shade2),
-                                colorResource(id = R.color.primary),
-                                colorResource(id = R.color.primary_variant),
-                                colorResource(id = R.color.primary_shade5)
+                                MaterialTheme.colorScheme.primaryContainer,
+                                MaterialTheme.colorScheme.primary,
+                                MaterialTheme.colorScheme.inversePrimary,
+                                MaterialTheme.colorScheme.onPrimaryContainer
                             )
                         ),
                         shape = RoundedCornerShape(
@@ -117,9 +118,14 @@ fun AddImageBottomSheet(
                     text = "Take a Photo",
                     style = AppTypography.button,
                     modifier = Modifier
-                        .padding(end = 4.dp)
+                        .padding(end = 4.dp),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-                Icon(imageVector = ImageVector.vectorResource(id = R.drawable.baseline_camera_alt_24), contentDescription = "Take a Photo")
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.baseline_camera_alt_24),
+                    contentDescription = "Take a Photo",
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
             }
         }
     }
