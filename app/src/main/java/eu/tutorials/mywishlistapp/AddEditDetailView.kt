@@ -156,7 +156,7 @@ fun AddEditDetailView(
                         shape = RoundedCornerShape(12.dp)
                     )
                     .background(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        color = MaterialTheme.colorScheme.primaryContainer,
                         shape = RoundedCornerShape(12.dp)
                     )
                     .padding(2.dp)
@@ -361,7 +361,8 @@ fun AddEditDetailView(
                         ) {
                             Text(
                                 text = "Yes",
-                                style = AppTypography.button
+                                style = AppTypography.button,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     },
@@ -373,7 +374,8 @@ fun AddEditDetailView(
                         ) {
                             Text(
                                 text = "Cancel",
-                                style = AppTypography.button
+                                style = AppTypography.button,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
