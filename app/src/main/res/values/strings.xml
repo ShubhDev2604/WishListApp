@@ -6,4 +6,6 @@
     <string name="wish_update">Wish has been updated.</string>
     <string name="empty_title_message">Title cannot remain empty.</string>
     <string name="empty_description_message">Description cannot remain empty.</string>
+    <string name="something_went_wrong">Something went wrong. Please try again later.</string>
+    <string name="wish_details">Wish Details</string>
 </resources>

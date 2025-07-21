@@ -1,4 +1,4 @@
-package com.lifehive.app
+package com.lifehive.app.ui.bottomsheet
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import com.lifehive.app.R
 import com.lifehive.app.ui.theme.AppTypography
 
 @OptIn(ExperimentalMaterial3Api::class)

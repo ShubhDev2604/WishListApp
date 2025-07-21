@@ -1,11 +1,11 @@
-package com.lifehive.app
+package com.lifehive.app.viewmodel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.lifehive.app.Graph
+import com.lifehive.app.data.Graph
 import com.lifehive.app.data.Wish
 import com.lifehive.app.data.WishRepository
 import kotlinx.coroutines.Dispatchers
