@@ -1,9 +1,7 @@
-package com.lifehive.app
+package com.lifehive.app.data
 
 import android.content.Context
 import androidx.room.Room
-import com.lifehive.app.data.WishDatabase
-import com.lifehive.app.data.WishRepository
 
 object Graph {
     lateinit var database: WishDatabase

@@ -1,4 +1,4 @@
-package com.lifehive.app
+package com.lifehive.app.ui.screen
 
 import android.content.Context
 import android.content.Intent
@@ -61,6 +61,10 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.lifehive.app.ui.bottomsheet.AddImageBottomSheet
+import com.lifehive.app.AppBarView
+import com.lifehive.app.R
+import com.lifehive.app.viewmodel.WishViewModel
 import com.lifehive.app.data.Wish
 import com.lifehive.app.ui.theme.AppTypography
 import kotlinx.coroutines.launch

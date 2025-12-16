@@ -1,4 +1,4 @@
-package com.lifehive.app
+package com.lifehive.app.ui.screen
 
 import android.content.Context
 import android.content.Intent
@@ -63,6 +63,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImage
+import com.lifehive.app.AppBarView
+import com.lifehive.app.R
+import com.lifehive.app.viewmodel.WishViewModel
 import com.lifehive.app.data.Wish
 import com.lifehive.app.ui.theme.AppTypography
 import kotlinx.coroutines.delay
@@ -227,7 +230,7 @@ fun HomeView(
                             dismissContent = {
                                 WishItem(wish = wish) {
                                     val id = wish.id
-                                    navController.navigate(Screen.AddScreen.route + "/$id")
+                                    navController.navigate(Screen.ViewScreen.route + "/$id")
                                 }
                             }
                         )
