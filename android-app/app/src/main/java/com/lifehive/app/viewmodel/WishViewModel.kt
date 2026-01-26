@@ -5,9 +5,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.lifehive.app.data.Graph
+import com.lifehive.app.singletons.Graph
 import com.lifehive.app.data.Wish
-import com.lifehive.app.data.WishRepository
+import com.lifehive.app.repository.WishRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch

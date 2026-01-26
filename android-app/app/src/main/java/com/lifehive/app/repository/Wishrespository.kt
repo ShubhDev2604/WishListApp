@@ -1,4 +1,4 @@
-package com.lifehive.app.data
+package com.lifehive.app.repository
 
 import com.lifehive.app.data.Wish
 import com.lifehive.app.data.WishDao
