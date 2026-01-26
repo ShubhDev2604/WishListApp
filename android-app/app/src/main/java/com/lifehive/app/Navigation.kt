@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.lifehive.app.ui.screen.AddEditDetailView
 import com.lifehive.app.ui.screen.HomeView
+import com.lifehive.app.ui.screen.LoginView
 import com.lifehive.app.ui.screen.Screen
 import com.lifehive.app.ui.screen.WishDetailView
 import com.lifehive.app.viewmodel.WishViewModel
@@ -19,8 +20,20 @@ fun Navigation(viewModel: WishViewModel = viewModel(),
                onToggleTheme: () -> Unit){
     NavHost(
         navController= navController,
-        startDestination = Screen.HomeScreen.route
+        startDestination = Screen.LoginScreen.route
     ){
+        composable(
+            route = Screen.LoginScreen.route
+        ) {
+            LoginView(
+                onLoginSuccess = {
+                    navController.navigate(Screen.HomeScreen.route) {
+                        popUpTo(Screen.LoginScreen.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
         composable(
             route = Screen.HomeScreen.route + "?snackbarMessage={snackbarMessage}",
             arguments = listOf(
