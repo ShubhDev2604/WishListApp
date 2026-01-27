@@ -16,8 +16,9 @@ public class UserService {
     private UserRepository repo;
     private BCryptPasswordEncoder encoder;
 
-    public UserService(UserRepository repo) {
+    public UserService(UserRepository repo, BCryptPasswordEncoder encoder) {
         this.repo = repo;
+        this.encoder = encoder;
     }
 
     public List<Users> fetchAllUsers() {
@@ -42,7 +43,7 @@ public class UserService {
         userLoginResponse.setId(userForRepo.getId());
         userLoginResponse.setTokenType("Bearer");
         userLoginResponse.setAccessToken("");
-        return new UserLoginResponse();
+        return userLoginResponse;
     }
 
     public UserLoginResponse verifyUser(UserRequest userRequest) throws Exception {

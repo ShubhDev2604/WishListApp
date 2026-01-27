@@ -28,7 +28,7 @@ public class SecurityConfig {
         return http
                 .csrf(customizer -> customizer.disable())
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/signup", "/login")
+                        .requestMatchers("/api/notes/signup", "/api/notes/login")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()
