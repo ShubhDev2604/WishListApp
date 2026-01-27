@@ -49,17 +49,17 @@ public class UserService {
     public UserLoginResponse verifyUser(UserRequest userRequest) throws Exception {
         String encodedPassword = encoder.encode(userRequest.getPassword());
         Users userFromRepo = repo.findByEmail(userRequest.getEmail());
-        UserLoginResponse response = null;
+        UserLoginResponse response = new UserLoginResponse();
         if(userFromRepo == null) {
             throw new UserNotFoundException();
         }
-        if(Objects.equals(encodedPassword, userFromRepo.getPassword())) {
+        if(encoder.matches(userRequest.getPassword(), userFromRepo.getPassword())) {
             response.setEmail(userFromRepo.getEmail());
             response.setRole(userFromRepo.getRole());
             response.setId(userFromRepo.getId());
             response.setTokenType("Bearer");
             response.setAccessToken("");
-            return new UserLoginResponse();
+            return response;
         } else {
             throw new PasswordNotMatchingException();
         }
