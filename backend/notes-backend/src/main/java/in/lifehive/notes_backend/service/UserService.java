@@ -4,6 +4,9 @@ import in.lifehive.notes_backend.exception.PasswordNotMatchingException;
 import in.lifehive.notes_backend.exception.UserNotFoundException;
 import in.lifehive.notes_backend.model.*;
 import in.lifehive.notes_backend.repository.UserRepository;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +18,14 @@ public class UserService {
 
     private UserRepository repo;
     private BCryptPasswordEncoder encoder;
+    private AuthenticationManager authenticationManager;
+    private JWTService jwtService;
 
-    public UserService(UserRepository repo, BCryptPasswordEncoder encoder) {
+    public UserService(UserRepository repo, BCryptPasswordEncoder encoder, AuthenticationManager authenticationManager, JWTService jwtService) {
         this.repo = repo;
         this.encoder = encoder;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
 
     public List<Users> fetchAllUsers() {
@@ -38,16 +45,15 @@ public class UserService {
         userForRepo.setEnabled(true);
         userForRepo = repo.save(userForRepo);
         UserLoginResponse userLoginResponse = new UserLoginResponse();
+        userLoginResponse.setAccessToken(jwtService.generateToken(user.getEmail()));
         userLoginResponse.setEmail(userForRepo.getEmail());
         userLoginResponse.setRole(userForRepo.getRole());
         userLoginResponse.setId(userForRepo.getId());
         userLoginResponse.setTokenType("Bearer");
-        userLoginResponse.setAccessToken("");
         return userLoginResponse;
     }
 
     public UserLoginResponse verifyUser(UserRequest userRequest) throws Exception {
-        String encodedPassword = encoder.encode(userRequest.getPassword());
         Users userFromRepo = repo.findByEmail(userRequest.getEmail());
         UserLoginResponse response = new UserLoginResponse();
         if(userFromRepo == null) {
@@ -58,10 +64,29 @@ public class UserService {
             response.setRole(userFromRepo.getRole());
             response.setId(userFromRepo.getId());
             response.setTokenType("Bearer");
-            response.setAccessToken("");
+            response.setAccessToken(jwtService.generateToken(userFromRepo.getEmail()));
             return response;
         } else {
             throw new PasswordNotMatchingException();
         }
+//        Authentication authentication =
+//                authenticationManager.authenticate(
+//                        new UsernamePasswordAuthenticationToken(
+//                                userRequest.getEmail(),
+//                                userRequest.getPassword()
+//                        )
+//                );
+//        Users userFromRepo = repo.findByEmail(userRequest.getEmail());
+//        UserLoginResponse response = new UserLoginResponse();
+//        if(authentication.isAuthenticated()) {
+//            response.setEmail(userFromRepo.getEmail());
+//            response.setRole(userFromRepo.getRole());
+//            response.setId(userFromRepo.getId());
+//            response.setTokenType("Bearer");
+//            response.setAccessToken(jwtService.generateToken(userFromRepo.getEmail()));
+//            return response;
+//        } else {
+//            throw new PasswordNotMatchingException();
+//        }
     }
 }

@@ -9,4 +9,5 @@ public class UserLoginResponse {
     String accessToken;
     String tokenType;
     Role role;
+    Long expiresIn;
 }
