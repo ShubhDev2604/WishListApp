@@ -7,12 +7,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lifehive.app.LoginEvent
 import com.lifehive.app.TokenManager
-import com.lifehive.app.data.LoginResponse
 import com.lifehive.app.data.LoginUiState
 import com.lifehive.app.repository.AuthRepository
+import com.lifehive.app.validators.EmailValidator
+import com.lifehive.app.validators.PasswordValidator
+import com.lifehive.app.validators.ValidationResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import okhttp3.Response
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,19 +30,27 @@ class LoginViewModel @Inject constructor(
             is LoginEvent.EmailChanged -> {
                 _uiState.value = _uiState.value.copy(
                     email = event.value,
-                    errorMessage = null
+                    emailError = null
                 )
             }
 
             is LoginEvent.PasswordChanged -> {
                 _uiState.value = _uiState.value.copy(
                     password = event.value,
-                    errorMessage = null
+                    passwordError = null
                 )
             }
 
             LoginEvent.LoginClicked -> {
                 login()
+            }
+
+            LoginEvent.SignupClicked -> {
+                signup()
+            }
+
+            LoginEvent.SignInWithGoogleClicked -> {
+
             }
         }
     }
@@ -49,12 +58,28 @@ class LoginViewModel @Inject constructor(
     private fun login() {
         val state = _uiState.value
 
-        if (state.email.isBlank() || state.password.isBlank()) {
-            _uiState.value = state.copy(
-                errorMessage = "Email and password cannot be empty"
+        val emailResult = EmailValidator.validate(state.email)
+        val passwordResult = PasswordValidator.validate(state.password)
+
+        var hasError = false
+
+        if (emailResult is ValidationResult.Invalid) {
+            hasError = true
+            _uiState.value = _uiState.value.copy(
+                email = state.email,
+                emailError = emailResult.message
             )
-            return
         }
+
+        if (passwordResult is ValidationResult.Invalid) {
+            hasError = true
+            _uiState.value = _uiState.value.copy(
+                email = state.email,
+                emailError = passwordResult.message
+            )
+        }
+
+        if (hasError) return
 
         _uiState.value = state.copy(isLoading = true)
 
@@ -81,12 +106,64 @@ class LoginViewModel @Inject constructor(
                 )
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    isLoggedIn = true
+                    isLoginSuccess = true
                 )
             }.onFailure { error ->
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = error.message ?: "Something went wrong"
+                    generalError = error.message ?: "Something went wrong"
+                )
+            }
+        }
+    }
+
+    private fun signup() {
+        val state = _uiState.value
+
+
+        val emailResult = EmailValidator.validate(state.email)
+        val passwordResult = PasswordValidator.validate(state.password)
+
+        var hasError = false
+
+        if (emailResult is ValidationResult.Invalid) {
+            hasError = true
+            _uiState.value = _uiState.value.copy(
+                email = state.email,
+                emailError = emailResult.message
+            )
+        }
+
+        if (passwordResult is ValidationResult.Invalid) {
+            hasError = true
+            _uiState.value = _uiState.value.copy(
+                email = state.email,
+                emailError = passwordResult.message
+            )
+        }
+
+        if (hasError) return
+
+        _uiState.value = state.copy(isLoading = true)
+
+        viewModelScope.launch {
+            val result = authRepository.signup(
+                state.email,
+                state.password
+            )
+            result.onSuccess { response ->
+                tokenManager.saveToken(
+                    response.accessToken,
+                    response.tokenType
+                )
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    isLoginSuccess = true
+                )
+            }.onFailure { error ->
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    generalError = error.message ?: "Something went wrong"
                 )
             }
         }

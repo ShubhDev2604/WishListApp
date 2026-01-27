@@ -10,6 +10,35 @@ class AuthRepository(
     private val authApi: AuthApi
 ) {
 
+    suspend fun signup(
+        email: String,
+        password: String
+    ): Result<LoginResponse> {
+        return try {
+            val response = authApi.signup(
+                LoginRequest(
+                    email = email,
+                    password = password
+                )
+            )
+
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    Result.success(it)
+                } ?: Result.failure(Exception("Empty response"))
+            } else {
+                Result.failure(
+                    Exception(
+                        response.errorBody()?.string() ?: "Login failed"
+                    )
+                )
+            }
+
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     suspend fun login(
         email: String,
         password: String

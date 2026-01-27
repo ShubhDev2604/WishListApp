@@ -9,6 +9,11 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface AuthApi {
+    @POST("/api/notes/signup")
+    suspend fun signup(
+        @Body request: LoginRequest
+    ): Response<LoginResponse>
+
     @POST("/api/notes/login")
     suspend fun login(
         @Body request: LoginRequest

@@ -1,9 +1,11 @@
 package com.lifehive.app.ui.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -156,16 +158,23 @@ fun LoginView(
             }
         }
 
-        state.errorMessage?.let {
+        if(!state.emailError.isNullOrEmpty() || !state.passwordError.isNullOrEmpty() || !state.generalError.isNullOrEmpty()) {
             Spacer(modifier = Modifier.height(8.dp))
+            val message: String = if(!state.emailError.isNullOrEmpty())
+                state.emailError!!
+            else (if(!state.passwordError.isNullOrEmpty())
+                state.passwordError
+            else
+                state.generalError).toString()
+
             Text(
-                text = it,
+                text = message,
                 color = MaterialTheme.colorScheme.error
             )
         }
 
-        LaunchedEffect(state.isLoggedIn) {
-            if (state.isLoggedIn) {
+        LaunchedEffect(state.isLoginSuccess) {
+            if (state.isLoginSuccess) {
                 onLoginSuccess()
             }
         }
