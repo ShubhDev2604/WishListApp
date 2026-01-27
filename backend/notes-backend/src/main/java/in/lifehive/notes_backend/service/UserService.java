@@ -89,4 +89,8 @@ public class UserService {
 //            throw new PasswordNotMatchingException();
 //        }
     }
+
+    public Users fetchUserByEmail(String username) {
+        return repo.findByEmail(username);
+    }
 }

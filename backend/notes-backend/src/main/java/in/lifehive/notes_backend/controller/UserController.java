@@ -1,12 +1,17 @@
 package in.lifehive.notes_backend.controller;
 
 import in.lifehive.notes_backend.model.UserLoginResponse;
+import in.lifehive.notes_backend.model.UserPrincipal;
 import in.lifehive.notes_backend.model.UserRequest;
 import in.lifehive.notes_backend.model.Users;
 import in.lifehive.notes_backend.service.UserService;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,6 +24,7 @@ public class UserController {
     UserService service;
 
     @GetMapping("/users")
+    @PreAuthorize("hasRole('ADMIN')")
     ResponseEntity<?> getAllUsers() {
         return new ResponseEntity<>(service.fetchAllUsers(), HttpStatus.OK);
     }
@@ -61,5 +67,16 @@ public class UserController {
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Something went wrong!");
         }
+    }
+
+    @GetMapping("/auth/me")
+    public UserLoginResponse getCurrentUser(Authentication authentication) throws SignatureException {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        Users user = service.fetchUserByEmail(userDetails.getUsername());
+        UserLoginResponse response = new UserLoginResponse();
+        response.setId(user.getId());
+        response.setEmail(user.getEmail());
+        response.setRole(user.getRole());
+        return response;
     }
 }
