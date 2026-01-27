@@ -1,14 +1,13 @@
 package in.lifehive.notes_backend.controller;
 
+import in.lifehive.notes_backend.model.UserLoginResponse;
+import in.lifehive.notes_backend.model.UserRequest;
 import in.lifehive.notes_backend.model.Users;
 import in.lifehive.notes_backend.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpMethod;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestController
 @RequestMapping("/api/notes")
@@ -36,22 +35,31 @@ public class UserController {
         }
     }
 
-    @GetMapping("/csrf-token")
-    ResponseEntity<CsrfToken> getCsrfToken(HttpServletRequest request) {
-        return ResponseEntity.ok().body((CsrfToken) request.getAttribute("_csrf"));
-    }
-
-    @PostMapping("/user")
-    ResponseEntity<String> insertNewUser(@RequestBody Users user) {
-        Users user1 = service.insertNewUsers(user);
-        if(user1 != null) {
+    @PostMapping("/signup")
+    ResponseEntity<?> userSignup(@Valid @RequestBody UserRequest userRequest) {
+        UserLoginResponse response = service.insertNewUsers(userRequest);
+        if(response != null) {
             return ResponseEntity
                     .ok()
-                    .body("User added");
+                    .body(response);
         } else {
             return ResponseEntity
-                    .internalServerError()
-                    .body("Something went wrong");
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Something went wrong!");
+        }
+    }
+
+    @PostMapping("/login")
+    ResponseEntity<?> userLogin(@Valid @RequestBody UserRequest userRequest) throws Exception {
+        UserLoginResponse response = service.verifyUser(userRequest);
+        if(response != null) {
+            return ResponseEntity
+                    .ok()
+                    .body(response);
+        } else {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Something went wrong!");
         }
     }
 }
