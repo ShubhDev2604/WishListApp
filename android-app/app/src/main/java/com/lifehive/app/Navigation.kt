@@ -7,6 +7,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.lifehive.app.ui.screen.AddEditDetailView
+import com.lifehive.app.ui.screen.AuthGateScreen
 import com.lifehive.app.ui.screen.HomeView
 import com.lifehive.app.ui.screen.LoginView
 import com.lifehive.app.ui.screen.Screen
@@ -17,10 +18,12 @@ import com.lifehive.app.viewmodel.WishViewModel
 fun Navigation(viewModel: WishViewModel = viewModel(),
                navController: NavHostController = rememberNavController(),
                isDarkTheme: Boolean,
-               onToggleTheme: () -> Unit){
+               onToggleTheme: () -> Unit,
+               startDestination: String
+               ){
     NavHost(
         navController= navController,
-        startDestination = Screen.LoginScreen.route
+        startDestination = startDestination
     ){
         composable(
             route = Screen.LoginScreen.route
@@ -74,6 +77,12 @@ fun Navigation(viewModel: WishViewModel = viewModel(),
         ){entry->
             val id = if(entry.arguments != null)  entry.arguments!!.getLong("id") else 0L
             WishDetailView(id = id, viewModel = viewModel , navController = navController)
+        }
+
+        composable(
+            route = Screen.AuthGate.route
+        ) {
+            AuthGateScreen(navController = navController)
         }
     }
 }

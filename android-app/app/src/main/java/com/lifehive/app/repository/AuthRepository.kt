@@ -2,8 +2,8 @@ package com.lifehive.app.repository
 
 import com.lifehive.app.data.LoginRequest
 import com.lifehive.app.data.LoginResponse
+import com.lifehive.app.data.SessionResult
 import com.lifehive.app.retrofit.AuthApi
-import com.lifehive.app.singletons.RetrofitClient
 
 
 class AuthRepository(
@@ -36,6 +36,19 @@ class AuthRepository(
 
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    suspend fun authChecker(): SessionResult {
+        return try {
+            val response = authApi.authChecker()
+            if(response.isSuccessful) {
+                SessionResult.Valid
+            } else {
+                SessionResult.Invalid
+            }
+        } catch (e: Exception) {
+            SessionResult.Invalid
         }
     }
 }
