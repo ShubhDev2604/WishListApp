@@ -1,6 +1,8 @@
 package com.lifehive.app.singletons
 
 import android.content.Context
+import com.chuckerteam.chucker.api.ChuckerCollector
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.lifehive.app.TokenManager
 import com.lifehive.app.repository.AuthRepository
 import com.lifehive.app.retrofit.AuthApi
@@ -32,16 +34,27 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(
-        authInterceptor: AuthInterceptor
+        authInterceptor: AuthInterceptor,
+        @ApplicationContext context: Context
     ): OkHttpClient {
         val logging = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
-        return OkHttpClient.Builder()
+        val builder = OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
             .addInterceptor(logging)
+
+        val chuckerInterceptor = ChuckerInterceptor.Builder(context)
+            .collector(ChuckerCollector(context))
+            .maxContentLength(250_000L)
+            .redactHeaders(setOf("Authorization"))
+            .alwaysReadResponseBody(true)
             .build()
+
+        builder.addInterceptor(chuckerInterceptor)
+
+        return builder.build()
     }
 
     @Provides
