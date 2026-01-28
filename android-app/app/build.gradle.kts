@@ -6,6 +6,27 @@ plugins {
 }
 
 android {
+    flavorDimensions += "env"
+    productFlavors {
+
+        create("dev") {
+            dimension = "env"
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                "\"http://10.0.2.2:8080/\""
+            )
+        }
+
+        create("prod") {
+            dimension = "env"
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                "\"https://api.myapp.com/\""
+            )
+        }
+    }
     namespace = "com.lifehive.app"
     compileSdk = 34
 
@@ -40,6 +61,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -77,6 +99,7 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.51")
     kapt("com.google.dagger:hilt-android-compiler:2.51")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
 
     implementation("androidx.core:core-ktx:1.12.0")
@@ -94,4 +117,6 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+    debugImplementation("com.github.chuckerteam.chucker:library:4.0.0")
+    releaseImplementation("com.github.chuckerteam.chucker:library-no-op:4.0.0")
 }

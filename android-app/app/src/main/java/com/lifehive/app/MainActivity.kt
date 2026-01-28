@@ -1,6 +1,7 @@
 package com.lifehive.app
 
 import android.content.Context
+import android.media.session.MediaSession.Token
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import com.lifehive.app.ui.screen.Screen
 import com.lifehive.app.ui.theme.LifeHiveTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -21,6 +23,12 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val tokenManager = TokenManager(applicationContext)
+        val startDestination = if(tokenManager.hasToken()) {
+            Screen.AuthGate.route
+        } else {
+            Screen.LoginScreen.route
+        }
         setContent {
             val context = LocalContext.current
             val isSystemDark = isSystemInDarkTheme()
@@ -49,7 +57,8 @@ class MainActivity : ComponentActivity() {
                                 .putBoolean("dark_theme", isDarkTheme)
                                 .apply()
                         },
-                        isDarkTheme = isDarkTheme
+                        isDarkTheme = isDarkTheme,
+                        startDestination = startDestination
                     )
                 }
             }
