@@ -6,6 +6,27 @@ plugins {
 }
 
 android {
+    flavorDimensions += "env"
+    productFlavors {
+
+        create("dev") {
+            dimension = "env"
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                "\"http://10.0.2.2:8080/\""
+            )
+        }
+
+        create("prod") {
+            dimension = "env"
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                "\"https://api.myapp.com/\""
+            )
+        }
+    }
     namespace = "com.lifehive.app"
     compileSdk = 34
 
@@ -40,6 +61,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
