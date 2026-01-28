@@ -23,7 +23,7 @@ android {
             buildConfigField(
                 "String",
                 "BASE_URL",
-                "\"https://api.myapp.com/\""
+                "\"https://first-deployment-latest-nn10.onrender.com/\""
             )
         }
     }
