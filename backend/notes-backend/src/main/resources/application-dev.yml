@@ -1,13 +1,9 @@
 spring:
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/ecommerce?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-    username: ecom_user
-    password: ecom123
+    url: ${DEV_DATASOURCE_URL}
+    username: ${DEV_DATASOURCE_USERNAME}
+    password: ${DEV_DATASOURCE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: update
-  security:
-    user:
-      name: Shubhi
-      password: Pass
