@@ -3,9 +3,10 @@ package com.lifehive.app.data
 data class LoginUiState(
     val email: String = "",
     val password: String = "",
-    val emailError: String? = null,
-    val passwordError: String? = null,
+    var emailError: String? = null,
+    var passwordError: String? = null,
     val isLoading: Boolean = false,
     val isLoginSuccess: Boolean = false,
-    val generalError: String? = null
+    var generalError: String? = null,
+    var isLoginFlow: Boolean = true
 )

@@ -52,6 +52,12 @@ class LoginViewModel @Inject constructor(
             LoginEvent.SignInWithGoogleClicked -> {
 
             }
+
+            LoginEvent.IsLoginFlow -> {
+                _uiState.value = _uiState.value.copy(
+                    isLoginFlow = !_uiState.value.isLoginFlow
+                )
+            }
         }
     }
 
