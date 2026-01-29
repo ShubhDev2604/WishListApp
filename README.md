@@ -17,6 +17,10 @@ A **full-stack, offline-first Notes application** with an Android client built u
 
   * Camera images are stored in the app’s internal directory
   * Gallery images persist their URI reference
+* **Implicit Intents** for enhanced user interaction:
+
+  * Long-press on note image opens external image viewer options
+  * Share notes via system Share Intent (text / content)
 * Secure API communication using **Retrofit**
 * **JWT tokens stored using EncryptedSharedPreferences** (token expiry: **15 minutes**)
 * Dependency Injection using **Hilt**
@@ -102,6 +106,7 @@ Since the backend is hosted on Render’s free tier, the **first login/signup re
 
 * A **debug production APK** is available via **GitHub Releases**.
 * Enable **notifications** after installing the app to inspect API calls using **Chucker**.
+* App demo is available via **Github Releases**.
 
 ---
 
