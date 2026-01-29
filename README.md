@@ -1,139 +1,171 @@
-📒 Notes Organizer App
+# Notes Management App
 
-Overview
+A **full-stack, offline-first Notes application** with an Android client built using modern Android development practices and a secure, production-style backend.
 
-Notes Organizer App is an offline-first Android application built using Kotlin, Jetpack Compose, and Room Database.
-The app allows users to create, edit, organize, and manage notes efficiently through a modern declarative UI and a scalable MVVM-based architecture.
+---
 
-This project focuses on production-ready Android development practices, including clean architecture, local data persistence, and predictable UI state management.
+## ✨ Features
 
-🚀 Features
-📝 Note Management
+### Android App
 
-Create Notes – Add notes with a title, description and image.
-![WhatsApp Image 2026-01-21 at 7 45 27 PM](https://github.com/user-attachments/assets/715f667b-ae2f-4d7f-81f1-381131f1d599)
+* Offline-first notes management with **RoomDB** as the local source of truth
+* Modern UI built with **Jetpack Compose + Material 3**, supporting **dynamic theming** that adapts automatically to system light/dark mode
+* **Theme preference persistence** using SharedPreferences to restore the last selected mode on app launch
+* Home screen built using **Scaffold** with **Floating Action Button (FAB)** for adding new notes
+* **Swipe-to-delete** interactions with reactive UI updates
+* **Bottom Sheet** for note image actions (capture via camera or upload from gallery)
 
-Edit Notes – Update existing notes seamlessly with state preservation.
-![WhatsApp Image 2026-01-21 at 7 45 23 PM (1)](https://github.com/user-attachments/assets/bdf90043-b5d7-4eb9-a598-7cea35d07748)
+  * Camera images are stored in the app’s internal directory
+  * Gallery images persist their URI reference
+* Secure API communication using **Retrofit**
+* **JWT tokens stored using EncryptedSharedPreferences** (token expiry: **15 minutes**)
+* Dependency Injection using **Hilt**
+* Image loading with **Coil**
+* Navigation implemented using **NavHostController**
+* Network inspection and debugging using **Chucker****
 
-Delete Notes – Remove notes using intuitive swipe-to-dismiss interactions.
-![WhatsApp Image 2026-01-21 at 7 45 24 PM (1)](https://github.com/user-attachments/assets/40d9d9da-e2f7-4746-b383-abe020b8eb07)
-![WhatsApp Image 2026-01-21 at 7 45 24 PM](https://github.com/user-attachments/assets/062d7a51-f7f4-4ef1-a3ea-57e923e82170)
+### Backend
 
-Bottomsheet to handle image capturing or image selection.
-![WhatsApp Image 2026-01-21 at 7 45 24 PM (2)](https://github.com/user-attachments/assets/d3376f44-790a-4f3a-b76d-1619c0ee2e24)
+* RESTful APIs built with **Spring Boot**
+* **Stateless authentication** using **Spring Security + JWT**
+* **JWT token validation** with custom authentication filter (15-minute expiry)
+* **Role-based access control (ADMIN / USER)**
 
-Long Press the Image to open the image in Gallery or in other image-supported App.
-![WhatsApp Image 2026-01-21 at 7 45 23 PM](https://github.com/user-attachments/assets/e3f505ac-197d-4090-9d9d-24ffab886e9e)
+  * ADMIN-only endpoint to fetch all users
+* Password hashing using **bcrypt**
+* Custom **Security Filter Chain** configuration
+* Centralized exception handling using **@ControllerAdvice**
+* JWT-layer authentication and authorization error handling with controller advice
+* JWT-layer authorization and authentication error handling
 
-Dark Mode/Light Mode and Consistent UI and theme across the whole app.
-![WhatsApp Image 2026-01-21 at 7 45 24 PM](https://github.com/user-attachments/assets/5d420d9f-9149-491c-a8c7-dfb389d34124)
-![WhatsApp Image 2026-01-21 at 7 45 24 PM (1)](https://github.com/user-attachments/assets/918ae55c-59ea-41d6-b0b6-22b27042a74b)
+---
 
-Empty UI Handling.
-![WhatsApp Image 2026-01-21 at 7 45 31 PM](https://github.com/user-attachments/assets/9b718a04-9245-4d68-ba5c-1338a4678082)
-![WhatsApp Image 2026-01-21 at 7 45 31 PM (1)](https://github.com/user-attachments/assets/d09b62fa-0c01-4bd8-9f25-3513be405065)
+## 🛠 Tech Stack
 
+### Android
 
+* Kotlin
+* Jetpack Compose
+* MVVM Architecture
+* Room Database
+* Retrofit & OkHttp
+* Hilt (Dependency Injection)
+* Coil
+* Coroutines
+* Chucker
 
-📦 Data & Architecture
+### Backend
 
-Offline-First Architecture – Notes are persisted locally using Room (SQLite).
+* Java
+* Spring Boot
+* Spring Security
+* Spring Data JPA & Hibernate
+* JWT
+* Maven
 
-Efficient List Rendering – Uses LazyColumn for optimized list performance.
+### Infrastructure
 
-State-Driven UI – UI reacts to state changes exposed by ViewModels.
+* Docker
+* Render (Backend deployment)
+* Neon (PostgreSQL database)
 
-Clean State Management – Based on MVVM, ensuring separation of concerns.
+---
 
-🎨 UI & UX
+## 🏗 Architecture Overview
 
-Modern Declarative UI – Built entirely with Jetpack Compose.
+* **Android** follows an **MVVM + Repository** pattern with Room as the single source of truth.
+* **Offline-first design** ensures full usability without network connectivity.
+* **Build Variants**:
 
-Dark / Light Theme Support – Adaptive theming using Material Design.
+  * **dev** → connects to local backend and local **MySQL** instance
+  * **prod** → connects to deployed backend on Render and **PostgreSQL (Neon)**
+* **Backend** exposes secure REST APIs consumed by the Android app via Retrofit.
+* Authentication is handled using **stateless JWT tokens**, securely stored on the client using EncryptedSharedPreferences.
+* Authentication is handled using **stateless JWT tokens**, stored securely on the client.
 
+---
 
+## 🚀 Deployment
 
+### Backend
 
-🧠 Architecture Overview
+* Spring Boot application **Dockerized locally**
+* Deployed on **Render (Free Tier)** using a custom Docker image
+* Production database hosted on **Neon (PostgreSQL)**
 
-The app follows MVVM (Model–View–ViewModel) architecture:
+⚠️ **Cold Start Note**
+Since the backend is hosted on Render’s free tier, the **first login/signup request may timeout** due to cold start. Please wait **1–2 minutes** and retry the request.
 
-Model
+---
 
-Room entities
+## 📦 APK & Demo
 
-DAO interfaces
+* A **debug production APK** is available via **GitHub Releases**.
+* Enable **notifications** after installing the app to inspect API calls using **Chucker**.
 
-Database configuration
+---
 
-ViewModel
+## 🔐 Authentication & App Launch Flow
 
-Manages UI state
+1. App launches → **Splash Screen** is displayed
+2. App automatically calls **GET /api/auth/me**
+3. Backend validates JWT:
 
-Handles business logic
+   * **200 OK** → user is redirected to Home screen
+   * **401 Unauthorized** → user is redirected to Login screen
+4. Login / Signup endpoints issue a JWT token upon success
+5. JWT is stored securely using **EncryptedSharedPreferences**
+6. Role-based authorization controls access to protected endpoints
 
-Uses Kotlin Coroutines for async operations
+---
 
-View (UI Layer)
+## 📂 Repository Structure (High-level)
 
-Jetpack Compose screens
+```
+android-app/
+ ├── ui
+ ├── viewmodel
+ ├── repository
+ ├── data (Room, Retrofit)
+backend/
+ ├── controller
+ ├── service
+ ├── repository
+ ├── security
+ └── exception
+```
 
-Stateless composables driven by ViewModel state
+android-app/
+backend/
+├── controller
+├── service
+├── repository
+├── security
+└── exception
 
-Repository
+```
 
-Abstracts data access
+---
 
-Acts as a single source of truth for local persistence
+## 👨‍💻 Author
 
-This structure ensures the codebase is scalable, testable, and maintainable.
+**Shubh Tandon**  
+Android / Backend / Full-Stack Developer
 
-🛠️ Tech Stack
+- GitHub: https://github.com/ShubhDev2604
+- LinkedIn: https://www.linkedin.com/in/shubh-tandon-8133b8201
 
-Language: Kotlin
+---
 
-UI Framework: Jetpack Compose
+## 📌 Notes
 
-Architecture: MVVM
+This project emphasizes **real-world engineering practices**, including:
+- Offline-first mobile architecture
+- Secure authentication & authorization
+- Environment-based configurations (dev/prod)
+- Cloud deployment using Docker
+- Debugging and observability using Chucker
 
-Database: Room (SQLite)
+The focus is on **production readiness**, not demo-only or tutorial-based implementations.
 
-Asynchronous Programming: Kotlin Coroutines
-
-UI Components: LazyColumn, Scaffold, SwipeToDismiss
-
-Theming: Material Design (Light/Dark mode)
-
-📁 Project Structure
-app/
-├── data/
-│   ├── local/              # Room entities, DAO, database
-│   └── repository/         # Data access abstraction
-├── ui/
-│   ├── screens/            # Compose screens
-│   └── components/         # Reusable UI components
-├── viewmodel/              # ViewModels (state & logic)
-└── MainActivity.kt         # Application entry point
-
-🔮 Future Enhancements
-
-Full-text search for notes
-
-Categorization and tagging
-
-Note lifecycle states (active, archived)
-
-Backend sync using Spring Boot
-
-User authentication and cloud backup
-
-👨‍💻 Author
-
-Shubh Tandon
-Android & Backend Developer
-GitHub: ShubhDev2604
-
-📄 License
-
-This project is open-source and intended for learning and portfolio demonstration purposes.
+```
